@@ -30,11 +30,15 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
+*.apk
+*.aab
+*.ap_
 
 # Symbolication related
 app.*.symbols
@@ -54,3 +58,6 @@ app.*.map.json
 **/android/**/GeneratedPluginRegistrant.java
 /android/build/
 /android/private_agent_android.iml
+*.keystore
+*.jks
+key.properties
