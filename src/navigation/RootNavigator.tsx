@@ -3,6 +3,8 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CompanionMode } from '../constants/appConstants';
+import { CompanionModeService } from '../services/CompanionModeService';
 import { isOnboardingComplete } from './onboarding';
 import type { MainTabParamList, RootStackParamList } from './types';
 import { DockScreen } from '../screens/DockScreen';
@@ -38,24 +40,33 @@ function MainTabs({
 export function RootNavigator(): React.JSX.Element {
   const [ready, setReady] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
-  const [docked, setDocked] = useState(false);
+  const [mode, setMode] = useState<CompanionMode>(CompanionMode.OPERATOR);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const done = await isOnboardingComplete();
+      const m = await CompanionModeService.hydrate();
       if (!cancelled) {
         setOnboarded(done);
+        setMode(m);
         setReady(true);
       }
     })();
+    const unsub = CompanionModeService.subscribe(setMode);
     return () => {
       cancelled = true;
+      unsub();
     };
   }, []);
 
-  const enterDock = useCallback(() => setDocked(true), []);
-  const exitDock = useCallback(() => setDocked(false), []);
+  const toggleCompanion = useCallback(() => {
+    void CompanionModeService.toggle();
+  }, []);
+
+  const exitDock = useCallback(() => {
+    void CompanionModeService.exitDocked();
+  }, []);
 
   if (!ready) {
     return (
@@ -64,6 +75,8 @@ export function RootNavigator(): React.JSX.Element {
       </View>
     );
   }
+
+  const docked = mode === CompanionMode.DOCKED;
 
   return (
     <NavigationContainer>
@@ -79,7 +92,10 @@ export function RootNavigator(): React.JSX.Element {
         ) : (
           <Stack.Screen name="MainTabs">
             {() => (
-              <MainTabs companionDocked={docked} onToggleCompanion={enterDock} />
+              <MainTabs
+                companionDocked={docked}
+                onToggleCompanion={toggleCompanion}
+              />
             )}
           </Stack.Screen>
         )}
