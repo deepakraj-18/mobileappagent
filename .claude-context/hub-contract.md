@@ -1,12 +1,18 @@
 # Companion ⇄ Brain — Hub Contract (v1)
 
 > **Task:** BD035 · **Plan:** [plan.md](plan.md) §4.2
-> **Status:** DRAFT v1 — the wire contract between the **Companion** (this Flutter app on the
-> Vivo Y17) and the **Brain** (the user's hosted Azure app). This document is the spec both sides
+> **Status:** DRAFT v1 — the wire contract between the **Companion** (this app on the
+> Vivo Y17 — **React Native as of 2026-09-06, was Flutter**, see `plan.md`'s framework-override
+> banner) and the **Brain** (the user's hosted Azure app). This document is the spec both sides
 > implement.
 > **Conventions:** REST follows `~/.claude/rules/api-design.md`; all errors follow
 > `~/.claude/rules/error-handling.md`. Timestamps are ISO-8601 UTC. IDs are strings.
 > Field names are `camelCase`. Enums are `UPPER_SNAKE_CASE` on the wire.
+>
+> **This contract is entirely stack-agnostic** — it's a wire protocol, not an implementation.
+> Nothing here changes because the companion moved from Flutter to React Native. The only
+> stale bits are the two `lib/services/*.dart` file-path references below (§6.1, §9) — treat
+> those as "wherever the RN app's equivalent lands," not literal paths.
 
 ---
 

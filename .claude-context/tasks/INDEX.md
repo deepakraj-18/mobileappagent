@@ -7,6 +7,27 @@ Estimates = ideal days. Order = dependency order.
 Per-task files not yet written — this index is the agreed breakdown; files get generated on go-ahead.
 The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Azure brain app).
 
+> ## 🔄 Framework override, 2026-09-06 — read `../plan.md`'s banner first
+>
+> This app is being rewritten in **React Native**, overriding this plan's original "stay on
+> Flutter (locked)" decision. **The phase structure, task scope, and dependency graph below
+> are unaffected and remain the reference for what to build.** What's stale, per-task, at
+> implementation time: every Flutter-specific package named below needs an RN equivalent
+> chosen when that task is actually started —
+> `sqflite`/`flutter_secure_storage`/`local_auth`/`sherpa-onnx`/`web_socket_channel`/
+> `flutter_local_notifications`-style packages, and every Kotlin↔Dart `MethodChannel` bridge
+> becomes a React Native **Native Module**. Whoever picks up a task should note the chosen RN
+> library in that task's own notes once written — don't let a second unstated decision drift
+> in silently the way the RN-vs-Flutter one did.
+>
+> `IF001`'s "GitHub Actions (`flutter analyze` + `flutter test`)" becomes `tsc --noEmit` +
+> `jest`, matching the parent project's existing RN app (`lifeosmobilev2`) conventions.
+>
+> The parent LifeOS repo's own task list covers the gate work sitting above this phase
+> breakdown: `IF004` (the actual Flutter-cleanup + RN-scaffold task), `SC001`/`SC002`
+> (security review). Phase 1 here (`IF001`, `IF002`, `SC001`–`SC008`, `DB001`, `BD013`)
+> starts only after that scaffold exists.
+
 ---
 
 ## Phase 1 — Companion runtime foundation

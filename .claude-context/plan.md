@@ -6,6 +6,43 @@
 
 ---
 
+## 🔄 Framework override, 2026-09-06 — read before anything else
+
+**§2's "stay on Flutter (locked)" decision is overridden. This app is being rewritten in
+React Native**, by explicit, informed user decision — made *after* being shown this exact
+plan's stated reasoning (RN discards 5,200 working Dart lines for no gain on the native
+automation core, since `AgentAccessibilityService.kt` is already framework-independent). The
+override stands; the reasoning below wasn't wrong, the decision was made anyway.
+
+**What this means for the rest of this document:**
+- **Feature scope, phasing, and sequencing (§1, §4, and `tasks/INDEX.md`'s Phases 1–6) stay
+  the intended reference** — the *what* doesn't change because the *how* did. Read them as
+  "what needs building," not "read `lib/services/X.dart`."
+- **Every Flutter-specific file path, package, and library choice throughout this doc and
+  `tasks/INDEX.md` is now stale** and needs a React Native equivalent selected *at
+  implementation time* for each task, not rewritten wholesale here:
+  `sqflite`→an RN SQLite binding, `flutter_secure_storage`→`react-native-keychain` (or
+  equivalent), `local_auth`→`react-native-biometrics`, the `sherpa-onnx` Flutter plugin→its RN
+  binding or an alternative, Flutter `MethodChannel`→an RN **Native Module**.
+- **`AgentAccessibilityService.kt` and `AndroidManifest.xml`'s permission grants survive
+  unchanged** — this was true under the original plan and remains true under React Native;
+  it's the one part of §2's table that needs no equivalent-finding at all.
+- **Telegram stays exactly as this plan already had it** — "kept in repo, unwired, default
+  off" (§2, §11-9) is unaffected by the framework change. No extra work either way; there is
+  no Dart file to "keep" once the rewrite happens, so in the new RN codebase this simply means:
+  don't build a Telegram integration unless a later task asks for one.
+- **The Flutter implementation is fully preserved**, not deleted blind: git tag
+  `archive/flutter-final` (pushed) + a filesystem copy at
+  `E:\Projects\LifeOS\_archive\deskcompanianapp-flutter-2026-09-06\` in the parent repo.
+
+**Both this submodule's own planning tree and the LifeOS parent repo's
+`.claude-context/plan.md` are being kept in sync going forward** (user decision) — this is the
+richer, hardware-verified source for *feature* scope; the parent's tasks cover the
+cross-cutting gates (submodule wiring, the RN scaffold/cleanup itself, security review) that
+sit above this phase breakdown. See the parent's `IF004`, `SC001`, `SC002`.
+
+---
+
 ## 1. Vision & scope
 
 An unused **Vivo Y17** becomes a **desk companion**: it sits docked and plugged in, listens
