@@ -34,7 +34,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 
 | ID | Title | Stream | Dependencies | Est | Status |
 |---|---|---|---|---|---|
-| IF001 | GitHub Actions (`flutter analyze` + `flutter test`) **+ Firebase project + `google-services.json`** for FCM | IF | — | 0.75 | Pending |
+| IF001 | GitHub Actions (`tsc --noEmit` + `jest`) **+ Firebase project + `google-services.json`** for FCM | IF | — | 0.75 | In Progress |
 | IF002 | Device provisioning runbook: enable a11y, notification access, **Vivo auto-start / battery / background-power whitelist**, ADB install script | IF | — | 0.5 | Pending |
 | SC001 | `lib/constants/app_constants.dart` — enums / magic numbers (companion mode, presence state, wake state, hub connection state, card kind) per `~/.claude/rules/constants.md` | SC | — | 0.5 | Pending |
 | DB001 | sqflite schema + migrations: `hub_outbox`, `hub_cache`, `event_log` (indexes on status/createdAt). **No user-data tables.** | DB | SC001 | 0.5 | Pending |
