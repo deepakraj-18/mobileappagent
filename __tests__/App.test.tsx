@@ -16,8 +16,29 @@ jest.mock('../src/native/Accessibility', () => ({
   isAccessibilityBridgeLinked: false,
 }));
 
-test('renders correctly', async () => {
-  await ReactTestRenderer.act(() => {
+jest.mock('@react-native-async-storage/async-storage', () => {
+  let store: Record<string, string> = {};
+  return {
+    setItem: jest.fn(async (k: string, v: string) => {
+      store[k] = v;
+    }),
+    getItem: jest.fn(async (k: string) => store[k] ?? null),
+    removeItem: jest.fn(async (k: string) => {
+      delete store[k];
+    }),
+    clear: jest.fn(async () => {
+      store = {};
+    }),
+  };
+});
+
+jest.mock('react-native-screens', () => ({
+  enableScreens: jest.fn(),
+  Screen: ({ children }: { children?: React.ReactNode }) => children ?? null,
+}));
+
+test('renders navigation shell', async () => {
+  await ReactTestRenderer.act(async () => {
     ReactTestRenderer.create(<App />);
   });
 });
