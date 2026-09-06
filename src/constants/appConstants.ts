@@ -110,3 +110,19 @@ export const WakeEventSource = {
 } as const;
 export type WakeEventSource =
   (typeof WakeEventSource)[keyof typeof WakeEventSource];
+
+/** How VoiceSession routes a transcript (hub stubbed until Phase 3). */
+export const VoiceRoute = {
+  HUB: 'HUB',
+  LOCAL_FALLBACK: 'LOCAL_FALLBACK',
+  COMMAND: 'COMMAND',
+} as const;
+export type VoiceRoute = (typeof VoiceRoute)[keyof typeof VoiceRoute];
+
+/** Built-in voice power commands (BD004). */
+export const VoicePowerCommand = {
+  WAKE: 'WAKE',
+  SLEEP: 'SLEEP',
+} as const;
+export type VoicePowerCommand =
+  (typeof VoicePowerCommand)[keyof typeof VoicePowerCommand];
