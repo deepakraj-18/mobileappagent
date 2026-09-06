@@ -10,6 +10,7 @@ class AccessibilityPackage : ReactPackage {
         listOf(
             AccessibilityModule(reactContext),
             CompanionModule(reactContext),
+            TtsModule(reactContext),
         )
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> =

@@ -45,7 +45,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | SC005 | `BootReceiver.kt` — `RECEIVE_BOOT_COMPLETED` → start FGS iff companion mode enabled | SC | SC004 | 0.5 | Review |
 | SC006 | Biometric app lock — `local_auth` (fingerprint + device-credential fallback); lock on resume; per-action gate hook; lock UI | SC | SC002 | 1.0 | Pending |
 | SC008 | Background event log + "Companion health" view (unattended failures visible) | SC | SC004, SC007 | 0.5 | Pending |
-| BD013 | Embodiment boundary — `Embodiment` interface (`speak/express/move/present`) + `PhoneEmbodiment` (TTS + dock state; `move` = no-op) | BD | SC001 | 0.5 | In Progress |
+| BD013 | Embodiment boundary — `Embodiment` interface (`speak/express/move/present`) + `PhoneEmbodiment` (TTS + dock state; `move` = no-op) | BD | SC001 | 0.5 | Review |
 
 ## Phase 2 — Voice loop
 
