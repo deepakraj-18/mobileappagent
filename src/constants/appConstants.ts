@@ -126,3 +126,12 @@ export const VoicePowerCommand = {
 } as const;
 export type VoicePowerCommand =
   (typeof VoicePowerCommand)[keyof typeof VoicePowerCommand];
+
+/**
+ * Target dock canvas (Vivo Y17 logical size from plan.md):
+ * 720×1544 px @ 320 dpi ≈ 360×772 dp.
+ */
+export const DockLayout = {
+  WIDTH_DP: 360,
+  HEIGHT_DP: 772,
+} as const;
