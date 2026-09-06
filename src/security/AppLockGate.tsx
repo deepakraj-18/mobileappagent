@@ -110,8 +110,8 @@ export function AppLockGate({ children }: Props): React.JSX.Element {
         result.reason === 'wrong_password'
           ? 'Incorrect password.'
           : result.reason === 'no_password_set'
-            ? 'No password set yet.'
-            : result.reason,
+          ? 'No password set yet.'
+          : result.reason,
       );
       return;
     }
@@ -152,9 +152,7 @@ export function AppLockGate({ children }: Props): React.JSX.Element {
       <Text style={styles.title}>PrivateAgent locked</Text>
       {mode === 'biometric' ? (
         <>
-          <Text style={styles.sub}>
-            Unlock with fingerprint to continue.
-          </Text>
+          <Text style={styles.sub}>Unlock with fingerprint to continue.</Text>
           {error ? <Text style={styles.err}>{error}</Text> : null}
           <Pressable
             style={[styles.btn, busy && styles.btnDisabled]}

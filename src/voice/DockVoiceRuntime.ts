@@ -1,4 +1,7 @@
-import { WakeState, type WakeState as WakeStateType } from '../constants/appConstants';
+import {
+  WakeState,
+  type WakeState as WakeStateType,
+} from '../constants/appConstants';
 import { phoneEmbodiment } from '../embodiment/PhoneEmbodiment';
 import { ScreenPower } from '../native/ScreenPower';
 import {

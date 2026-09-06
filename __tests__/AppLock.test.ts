@@ -1,8 +1,5 @@
 import { AppLimits } from '../src/constants/appConstants';
-import {
-  AppLock,
-  type AppLockPasswordStore,
-} from '../src/security/AppLock';
+import { AppLock, type AppLockPasswordStore } from '../src/security/AppLock';
 
 function memoryStore(): AppLockPasswordStore & { value: string | null } {
   const store = {
@@ -33,7 +30,9 @@ describe('AppLock password fallback', () => {
     const result = await AppLock.setPassword('ab');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.reason).toContain(String(AppLimits.APP_LOCK_PASSWORD_MIN_LEN));
+      expect(result.reason).toContain(
+        String(AppLimits.APP_LOCK_PASSWORD_MIN_LEN),
+      );
     }
   });
 

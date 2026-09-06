@@ -43,15 +43,15 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | SC003 | `CompanionModeService` — persisted docked-companion flag + lifecycle events; toggle entry point                                                 | SC     | SC001        | 0.5  | Review |
 | SC004 | `CompanionForegroundService.kt` + RN hook — persistent notification, `START_STICKY`, wakelock, keep-screen-on hooks; manifest perms             | SC     | SC003        | 1.5  | Review |
 | SC005 | `BootReceiver.kt` — `RECEIVE_BOOT_COMPLETED` → start FGS iff companion mode enabled                                                             | SC     | SC004        | 0.5  | Review |
-| SC006 | Biometric app lock — `react-native-biometrics` (fingerprint + device-credential fallback); lock on resume; per-action gate hook; lock UI        | SC     | SC002        | 1.0  | PASS |
+| SC006 | Biometric app lock — `react-native-biometrics` (fingerprint + device-credential fallback); lock on resume; per-action gate hook; lock UI        | SC     | SC002        | 1.0  | PASS   |
 | SC008 | Background event log + "Companion health" view (unattended failures visible)                                                                    | SC     | SC004, SC007 | 0.5  | Review |
 | SC009 | App-lock **password fallback** — Keystore password when biometrics fail/unavailable; Settings set/change                                        | SC     | SC006        | 0.5  | Review |
 | BD013 | Embodiment boundary — `Embodiment` interface (`speak/express/move/present`) + `PhoneEmbodiment` (TTS + dock state; `move` = no-op)              | BD     | SC001        | 0.5  | Review |
 
 ## Phase 2 — Voice loop
 
-| ID    | Title                                                                                                                                                                                                                                    | Stream | Dependencies | Est  | Status  |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------ | ---- | ------- |
+| ID    | Title                                                                                                                                                                                                                                    | Stream | Dependencies | Est  | Status |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------ | ---- | ------ |
 | BD003 | `WakeWordService` — sherpa-onnx KWS, bundled model, duty-cycled start/stop with the FGS, wake-event stream; tap-to-talk fallback                                                                                                         | BD     | SC004        | 2.0  | Review |
 | BD004 | `VoiceSession` state machine (wake → STT → route: hub \| local-fallback \| command → TTS); voice `wake`/`sleep`. **+ `ScreenPowerPlugin.kt`** (sleep = `GLOBAL_ACTION_LOCK_SCREEN`/DevAdmin; wake = `FULL_WAKE_LOCK` + `KEEP_SCREEN_ON`) | BD     | BD003, BD013 | 2.5  | Review |
 | FD001 | Dock screen shell — compact (360×772 dp): clock/date, listening state, wake/speaking animation, tap-to-talk, connection + presence chips (placeholders until Phase 3/5)                                                                  | FD     | SC002, BD013 | 1.5  | Review |

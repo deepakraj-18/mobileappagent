@@ -5,11 +5,11 @@ with the English GigaSpeech zipformer int8 checkpoint under `assets/kws/`.
 
 ## Files
 
-| File | Role |
-|------|------|
-| `encoder-…int8.onnx` / `decoder-…` / `joiner-…` | KWS transducer |
-| `tokens.txt` | BPE tokens |
-| `keywords.txt` | Spotting phrases (BPE). Default includes **Hey Genie** |
+| File                                            | Role                                                   |
+| ----------------------------------------------- | ------------------------------------------------------ |
+| `encoder-…int8.onnx` / `decoder-…` / `joiner-…` | KWS transducer                                         |
+| `tokens.txt`                                    | BPE tokens                                             |
+| `keywords.txt`                                  | Spotting phrases (BPE). Default includes **Hey Genie** |
 
 At runtime `KwsAssets.ensureModelDir()` copies these into the app `filesDir`
 so the native library can open filesystem paths.

@@ -1,6 +1,5 @@
-jest.mock(
-  '../src/services/CompanionModeService',
-  () => require('./mocks/companionModeService'),
+jest.mock('../src/services/CompanionModeService', () =>
+  require('./mocks/companionModeService'),
 );
 
 import { CompanionMode, WakeEventSource } from '../src/constants/appConstants';
@@ -24,9 +23,9 @@ function floatToPcm16Base64(samples: number[]): string {
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i]!);
   }
-  return (
-    globalThis as unknown as { btoa: (data: string) => string }
-  ).btoa(binary);
+  return (globalThis as unknown as { btoa: (data: string) => string }).btoa(
+    binary,
+  );
 }
 
 describe('pcm16Base64ToFloat32', () => {

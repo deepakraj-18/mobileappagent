@@ -13,6 +13,16 @@
 > Nothing here changes because the companion moved from Flutter to React Native. The only
 > stale bits are the two `lib/services/*.dart` file-path references below (§6.1, §9) — treat
 > those as "wherever the RN app's equivalent lands," not literal paths.
+>
+> **🔄 "Brain" resolved, 2026-09-07 (decided in the parent LifeOS repo's `tasks/BD/BD003.md`,
+> asked directly, not assumed):** Brain is not a separate third backend. It's `LifeOSAPI`
+> (extended with the hub/pairing/WSS layer this contract describes — it already owns every
+> domain listed in §1's table) plus `tessrag` for LLM/conversation turns, which already does
+> this job for the other LifeOS clients. Security model: the companion never gets blanket
+> `LifeOSAPI` access — only a curated, explicit allow-list of endpoints is reachable as hub
+> commands, the same posture just decided for Finance's AI-tool exposure
+> (`docs/modules/MODULE_05_FINANCE_VAULT.md` §10 in the parent repo). Anything reveal/secret-
+> shaped is never on that list. This unblocks Phase 3 (`BD030`–`BD034`) for real.
 
 ---
 

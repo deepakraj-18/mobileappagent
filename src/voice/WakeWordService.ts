@@ -30,7 +30,12 @@ export type KwsEngine = {
   acceptWaveform(
     sampleRate: number,
     samples: number[],
-  ): Promise<{ success: boolean; detected: boolean; keyword: string; error?: string }>;
+  ): Promise<{
+    success: boolean;
+    detected: boolean;
+    keyword: string;
+    error?: string;
+  }>;
   resetStream(): Promise<{ success: boolean }>;
   release(): Promise<{ released: boolean }>;
 };
@@ -182,8 +187,7 @@ class WakeWordServiceImpl {
       return true;
     }
 
-    const requestPerm =
-      this.deps.requestMicPermission ?? defaultMicPermission;
+    const requestPerm = this.deps.requestMicPermission ?? defaultMicPermission;
     const granted = await requestPerm();
     if (!granted) {
       return false;
@@ -268,7 +272,12 @@ class WakeWordServiceImpl {
   }
 
   private async onMicChunk(b64: string): Promise<void> {
-    if (!this.listening || !this.kws || !this.kwsReady || this.processingChunk) {
+    if (
+      !this.listening ||
+      !this.kws ||
+      !this.kwsReady ||
+      this.processingChunk
+    ) {
       return;
     }
     this.processingChunk = true;
@@ -277,7 +286,10 @@ class WakeWordServiceImpl {
       if (samples.length === 0) {
         return;
       }
-      const result = await this.kws.acceptWaveform(WakeWord.SAMPLE_RATE, samples);
+      const result = await this.kws.acceptWaveform(
+        WakeWord.SAMPLE_RATE,
+        samples,
+      );
       if (result.success && result.detected && result.keyword) {
         this.emit({
           source: WakeEventSource.KEYWORD,

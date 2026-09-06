@@ -97,7 +97,9 @@ class AppLockImpl {
     return this.passwords.hasPassword();
   }
 
-  async setPassword(password: string): Promise<{ ok: true } | { ok: false; reason: string }> {
+  async setPassword(
+    password: string,
+  ): Promise<{ ok: true } | { ok: false; reason: string }> {
     const trimmed = password.trim();
     if (trimmed.length < AppLimits.APP_LOCK_PASSWORD_MIN_LEN) {
       return {
