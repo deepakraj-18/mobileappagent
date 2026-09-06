@@ -41,7 +41,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | SC007 | `LocalStore` — open/init/migrate; DAOs for outbox (FIFO + ack + cap), cache (kv + typed cards), event log | SC | SC001, DB001 | 0.75 | Review |
 | SC002 | Navigation shell — bottom nav `Operator · Settings`; onboarding gate; Dock as a separate full-screen route via the Companion-Mode toggle | SC | SC001 | 0.75 | Review |
 | SC003 | `CompanionModeService` — persisted docked-companion flag + lifecycle events; toggle entry point | SC | SC001 | 0.5 | Review |
-| SC004 | `CompanionForegroundService.kt` + RN hook — persistent notification, `START_STICKY`, wakelock, keep-screen-on hooks; manifest perms | SC | SC003 | 1.5 | In Progress |
+| SC004 | `CompanionForegroundService.kt` + RN hook — persistent notification, `START_STICKY`, wakelock, keep-screen-on hooks; manifest perms | SC | SC003 | 1.5 | Review |
 | SC005 | `BootReceiver.kt` — `RECEIVE_BOOT_COMPLETED` → start FGS iff companion mode enabled | SC | SC004 | 0.5 | Pending |
 | SC006 | Biometric app lock — `local_auth` (fingerprint + device-credential fallback); lock on resume; per-action gate hook; lock UI | SC | SC002 | 1.0 | Pending |
 | SC008 | Background event log + "Companion health" view (unattended failures visible) | SC | SC004, SC007 | 0.5 | Pending |

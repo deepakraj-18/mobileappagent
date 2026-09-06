@@ -1,6 +1,3 @@
-import { CompanionMode } from '../src/constants/appConstants';
-import { CompanionModeService } from '../src/services/CompanionModeService';
-
 jest.mock('@react-native-async-storage/async-storage', () => {
   let store: Record<string, string> = {};
   return {
@@ -17,8 +14,20 @@ jest.mock('@react-native-async-storage/async-storage', () => {
   };
 });
 
+jest.mock('../src/native/CompanionRuntime', () => ({
+  CompanionRuntime: {
+    start: jest.fn(async () => true),
+    stop: jest.fn(async () => true),
+  },
+}));
+
+import { CompanionMode } from '../src/constants/appConstants';
+import { CompanionModeService } from '../src/services/CompanionModeService';
+import { CompanionRuntime } from '../src/native/CompanionRuntime';
+
 describe('CompanionModeService', () => {
   beforeEach(async () => {
+    jest.clearAllMocks();
     await CompanionModeService.setMode(CompanionMode.OPERATOR);
   });
 
@@ -28,6 +37,7 @@ describe('CompanionModeService', () => {
     await CompanionModeService.enterDocked();
     expect(CompanionModeService.isDocked()).toBe(true);
     expect(seen).toContain(CompanionMode.DOCKED);
+    expect(CompanionRuntime.start).toHaveBeenCalled();
     await CompanionModeService.hydrate();
     expect(CompanionModeService.getMode()).toBe(CompanionMode.DOCKED);
     unsub();

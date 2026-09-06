@@ -1,0 +1,33 @@
+diff --git a/node_modules/@react-native/codegen/lib/parsers/typescript/components/commands.js b/node_modules/@react-native/codegen/lib/parsers/typescript/components/commands.js
+index 8b81856..96e127d 100644
+--- a/node_modules/@react-native/codegen/lib/parsers/typescript/components/commands.js
++++ b/node_modules/@react-native/codegen/lib/parsers/typescript/components/commands.js
+@@ -18,6 +18,11 @@ const {getPrimitiveTypeAnnotation} = require('./componentsUtils');
+ function buildCommandSchemaInternal(name, optional, parameters, types, parser) {
+   var _firstParam$typeAnnot, _firstParam$typeAnnot2;
+   const firstParam = parameters[0].typeAnnotation;
++  const refName =
++    ((_firstParam$typeAnnot2 = firstParam.typeAnnotation.typeName.right) ===
++      null || _firstParam$typeAnnot2 === void 0
++      ? void 0
++      : _firstParam$typeAnnot2.name) ?? '';
+   if (
+     !(
+       firstParam.typeAnnotation != null &&
+@@ -26,14 +31,11 @@ function buildCommandSchemaInternal(name, optional, parameters, types, parser) {
+         null || _firstParam$typeAnnot === void 0
+         ? void 0
+         : _firstParam$typeAnnot.name) === 'React' &&
+-      ((_firstParam$typeAnnot2 = firstParam.typeAnnotation.typeName.right) ===
+-        null || _firstParam$typeAnnot2 === void 0
+-        ? void 0
+-        : _firstParam$typeAnnot2.name) === 'ElementRef'
++      (refName === 'ElementRef' || refName === 'ComponentRef')
+     )
+   ) {
+     throw new Error(
+-      `The first argument of method ${name} must be of type React.ElementRef<>`,
++      `The first argument of method ${name} must be of type React.ElementRef<> or React.ComponentRef<>`,
+     );
+   }
+   const params = parameters.slice(1).map(param => {

@@ -47,6 +47,16 @@
         </intent-filter>
       </activity>
 
+      <!-- Companion docked runtime (SC004) -->
+      <service
+          android:name=".CompanionForegroundService"
+          android:exported="false"
+          android:foregroundServiceType="specialUse">
+          <property
+              android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+              android:value="Desk companion runtime: keeps the docked body awake for hub/voice while charging." />
+      </service>
+
       <!-- PrivateAgent accessibility service: reads screen hierarchy and
            performs gestures on behalf of the user. -->
       <service

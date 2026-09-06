@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CompanionMode } from '../constants/appConstants';
+import { CompanionRuntime } from '../native/CompanionRuntime';
 
 const KEY = 'pa.companion.mode';
 
@@ -15,6 +16,9 @@ class CompanionModeServiceImpl {
     this.mode =
       raw === CompanionMode.DOCKED ? CompanionMode.DOCKED : CompanionMode.OPERATOR;
     this.hydrated = true;
+    if (this.mode === CompanionMode.DOCKED) {
+      void CompanionRuntime.start();
+    }
     this.emit();
     return this.mode;
   }
@@ -30,6 +34,11 @@ class CompanionModeServiceImpl {
   async setMode(mode: CompanionMode): Promise<void> {
     this.mode = mode;
     await AsyncStorage.setItem(KEY, mode);
+    if (mode === CompanionMode.DOCKED) {
+      void CompanionRuntime.start();
+    } else {
+      void CompanionRuntime.stop();
+    }
     this.emit();
   }
 
