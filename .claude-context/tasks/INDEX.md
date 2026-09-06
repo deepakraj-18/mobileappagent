@@ -54,7 +54,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | BD003 | `WakeWordService` — sherpa-onnx KWS, bundled model, duty-cycled start/stop with the FGS, wake-event stream; tap-to-talk fallback                                                                                                         | BD     | SC004        | 2.0  | Review |
 | BD004 | `VoiceSession` state machine (wake → STT → route: hub \| local-fallback \| command → TTS); voice `wake`/`sleep`. **+ `ScreenPowerPlugin.kt`** (sleep = `GLOBAL_ACTION_LOCK_SCREEN`/DevAdmin; wake = `FULL_WAKE_LOCK` + `KEEP_SCREEN_ON`) | BD     | BD003, BD013 | 2.5  | Review |
 | FD001 | Dock screen shell — compact (360×772 dp): clock/date, listening state, wake/speaking animation, tap-to-talk, connection + presence chips (placeholders until Phase 3/5)                                                                  | FD     | SC002, BD013 | 1.5  | Review |
-| FI005 | Wire Dock ↔ CompanionMode + WakeWord + VoiceSession (hub + presence wired later)                                                                                                                                                         | FI     | FD001, BD004 | 0.75 | In Progress |
+| FI005 | Wire Dock ↔ CompanionMode + WakeWord + VoiceSession (hub + presence wired later)                                                                                                                                                         | FI     | FD001, BD004 | 0.75 | Review |
 
 ## Phase 3 — Hub client (core integration)
 

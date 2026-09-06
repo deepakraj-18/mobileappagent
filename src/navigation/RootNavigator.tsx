@@ -3,7 +3,11 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CompanionMode } from '../constants/appConstants';
+import {
+  CompanionMode,
+  WakeState,
+  type WakeState as WakeStateType,
+} from '../constants/appConstants';
 import { CompanionModeService } from '../services/CompanionModeService';
 import { isOnboardingComplete } from './onboarding';
 import type { MainTabParamList, RootStackParamList } from './types';
@@ -12,6 +16,10 @@ import { DockScreen } from '../screens/DockScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import {
+  startDockVoiceRuntime,
+  type DockVoiceRuntime,
+} from '../voice/DockVoiceRuntime';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -38,6 +46,36 @@ function MainTabs({
         )}
       </Tab.Screen>
     </Tab.Navigator>
+  );
+}
+
+function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
+  const [wakeState, setWakeState] = useState<WakeStateType>(
+    WakeState.LISTENING_FOR_WAKE,
+  );
+  const runtimeRef = React.useRef<DockVoiceRuntime | null>(null);
+
+  useEffect(() => {
+    const runtime = startDockVoiceRuntime();
+    runtimeRef.current = runtime;
+    const unsub = runtime.subscribe(setWakeState);
+    return () => {
+      unsub();
+      runtime.stop();
+      runtimeRef.current = null;
+    };
+  }, []);
+
+  const onTapToTalk = useCallback(() => {
+    runtimeRef.current?.tapToTalk();
+  }, []);
+
+  return (
+    <DockScreen
+      onExit={onExit}
+      wakeState={wakeState}
+      onTapToTalk={onTapToTalk}
+    />
   );
 }
 
@@ -92,7 +130,7 @@ export function RootNavigator(): React.JSX.Element {
           </Stack.Screen>
         ) : docked ? (
           <Stack.Screen name="Dock">
-            {() => <DockScreen onExit={exitDock} />}
+            {() => <DockRoute onExit={exitDock} />}
           </Stack.Screen>
         ) : showHealth ? (
           <Stack.Screen name="Health">
