@@ -14,8 +14,8 @@ export function OnboardingScreen({ onDone }: Props): React.JSX.Element {
     <View style={styles.root}>
       <Text style={styles.title}>Welcome to PrivateAgent</Text>
       <Text style={styles.body}>
-        Enable Accessibility for PrivateAgent, whitelist background power on Vivo
-        (see docs/DEVICE_PROVISIONING.md), then continue.
+        Enable Accessibility for PrivateAgent, whitelist background power on
+        Vivo (see docs/DEVICE_PROVISIONING.md), then continue.
       </Text>
       <Pressable style={styles.btn} onPress={finish}>
         <Text style={styles.btnText}>Continue</Text>
@@ -25,7 +25,13 @@ export function OnboardingScreen({ onDone }: Props): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, padding: 24, justifyContent: 'center', gap: 16, backgroundColor: '#0f172a' },
+  root: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+    gap: 16,
+    backgroundColor: '#0f172a',
+  },
   title: { color: '#f8fafc', fontSize: 24, fontWeight: '700' },
   body: { color: '#94a3b8', fontSize: 15, lineHeight: 22 },
   btn: {

@@ -13,46 +13,46 @@ surface as in-scope attack surface.
 
 ### 1.1 Pre-trim inventory (SC001 baseline — 15 `<uses-permission>` + a11y bind)
 
-| # | Declaration | Reach / notes |
-|---|---|---|
-| 1 | `INTERNET` | Network (LLM / future hub) |
-| 2 | `ACCESS_NETWORK_STATE` | Connectivity checks |
-| 3 | `WAKE_LOCK` | Keep CPU awake while agent runs |
-| 4 | `SYSTEM_ALERT_WINDOW` | Draw over other apps |
-| 5 | `FOREGROUND_SERVICE` | Long-running companion process |
-| 6 | `FOREGROUND_SERVICE_SPECIAL_USE` | FGS subtype for companion use |
-| 7 | `QUERY_ALL_PACKAGES` | Enumerate installed apps (launcher / automation) |
-| 8 | `RECORD_AUDIO` | Microphone (voice) |
-| 9 | `READ_CONTACTS` | Read contacts |
-| 10 | `WRITE_CONTACTS` | Write contacts |
-| 11 | `POST_NOTIFICATIONS` | Notifications (API 33+) |
-| 12 | `VIBRATE` | Haptics / alerts |
-| 13 | `WRITE_SETTINGS` | Modify system settings (protected) |
-| 14 | `MODIFY_AUDIO_SETTINGS` | Volume / audio routing |
-| 15 | `SET_ALARM` | Alarm intents |
-| 16 | `BIND_ACCESSIBILITY_SERVICE` (on `AgentAccessibilityService`) | Read/act on every screen |
+| #   | Declaration                                                   | Reach / notes                                    |
+| --- | ------------------------------------------------------------- | ------------------------------------------------ |
+| 1   | `INTERNET`                                                    | Network (LLM / future hub)                       |
+| 2   | `ACCESS_NETWORK_STATE`                                        | Connectivity checks                              |
+| 3   | `WAKE_LOCK`                                                   | Keep CPU awake while agent runs                  |
+| 4   | `SYSTEM_ALERT_WINDOW`                                         | Draw over other apps                             |
+| 5   | `FOREGROUND_SERVICE`                                          | Long-running companion process                   |
+| 6   | `FOREGROUND_SERVICE_SPECIAL_USE`                              | FGS subtype for companion use                    |
+| 7   | `QUERY_ALL_PACKAGES`                                          | Enumerate installed apps (launcher / automation) |
+| 8   | `RECORD_AUDIO`                                                | Microphone (voice)                               |
+| 9   | `READ_CONTACTS`                                               | Read contacts                                    |
+| 10  | `WRITE_CONTACTS`                                              | Write contacts                                   |
+| 11  | `POST_NOTIFICATIONS`                                          | Notifications (API 33+)                          |
+| 12  | `VIBRATE`                                                     | Haptics / alerts                                 |
+| 13  | `WRITE_SETTINGS`                                              | Modify system settings (protected)               |
+| 14  | `MODIFY_AUDIO_SETTINGS`                                       | Volume / audio routing                           |
+| 15  | `SET_ALARM`                                                   | Alarm intents                                    |
+| 16  | `BIND_ACCESSIBILITY_SERVICE` (on `AgentAccessibilityService`) | Read/act on every screen                         |
 
 ### 1.2 SC002 day-one justification table
 
-| Permission | Feature requiring it | Day-one? | Decision |
-|---|---|---|---|
-| `INTERNET` | Hub / LLM HTTP(S) | Y | **Keep** |
-| `ACCESS_NETWORK_STATE` | Connectivity checks before network calls | Y | **Keep** |
-| `WAKE_LOCK` | Companion FGS keeps CPU awake while docked | Y | **Keep** |
-| `FOREGROUND_SERVICE` | `CompanionForegroundService` (Phase 1 SC004) | Y | **Keep** |
-| `FOREGROUND_SERVICE_SPECIAL_USE` | Companion FGS subtype (`specialUse`) | Y | **Keep** — subtype + justification string land on the FGS service in SC004 (Android 14+) |
-| `QUERY_ALL_PACKAGES` | Launcher / a11y automation over installed apps | Y | **Keep** |
-| `POST_NOTIFICATIONS` | Persistent companion notification | Y | **Keep** — request at point of use when FGS starts, not at cold launch |
-| `VIBRATE` | Notification / alert haptics | Y | **Keep** |
-| `RECEIVE_BOOT_COMPLETED` | Restart companion FGS after reboot if docked | Y | **Added SC005** — BootReceiver; no remote trigger |
-| `BIND_ACCESSIBILITY_SERVICE` | `AgentAccessibilityService` | Y | **Keep** (on service) |
-| `SYSTEM_ALERT_WINDOW` | Floating overlay assistant | N | **Removed** — no RN overlay shipping; also stripped via `tools:node="remove"` so React Native’s **debug**-only merge (`ReactAndroid/src/debug`) cannot reintroduce it |
-| `RECORD_AUDIO` | Wake word / STT | N | **Removed** — Phase 2 voice; re-add with that task |
-| `READ_CONTACTS` | Contact pick / dial-by-name | N | **Removed** — no shipping feature reads contacts |
-| `WRITE_CONTACTS` | Contact mutation | N | **Removed** — no shipping feature writes contacts |
-| `WRITE_SETTINGS` | System setting changes | N | **Removed** — no shipping feature modifies Settings |
-| `MODIFY_AUDIO_SETTINGS` | Volume / routing | N | **Removed** — no shipping audio-routing feature |
-| `SET_ALARM` | AlarmClock intents | N | **Removed** — no shipping alarm feature |
+| Permission                       | Feature requiring it                           | Day-one? | Decision                                                                                                                                                              |
+| -------------------------------- | ---------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `INTERNET`                       | Hub / LLM HTTP(S)                              | Y        | **Keep**                                                                                                                                                              |
+| `ACCESS_NETWORK_STATE`           | Connectivity checks before network calls       | Y        | **Keep**                                                                                                                                                              |
+| `WAKE_LOCK`                      | Companion FGS keeps CPU awake while docked     | Y        | **Keep**                                                                                                                                                              |
+| `FOREGROUND_SERVICE`             | `CompanionForegroundService` (Phase 1 SC004)   | Y        | **Keep**                                                                                                                                                              |
+| `FOREGROUND_SERVICE_SPECIAL_USE` | Companion FGS subtype (`specialUse`)           | Y        | **Keep** — subtype + justification string land on the FGS service in SC004 (Android 14+)                                                                              |
+| `QUERY_ALL_PACKAGES`             | Launcher / a11y automation over installed apps | Y        | **Keep**                                                                                                                                                              |
+| `POST_NOTIFICATIONS`             | Persistent companion notification              | Y        | **Keep** — request at point of use when FGS starts, not at cold launch                                                                                                |
+| `VIBRATE`                        | Notification / alert haptics                   | Y        | **Keep**                                                                                                                                                              |
+| `RECEIVE_BOOT_COMPLETED`         | Restart companion FGS after reboot if docked   | Y        | **Added SC005** — BootReceiver; no remote trigger                                                                                                                     |
+| `BIND_ACCESSIBILITY_SERVICE`     | `AgentAccessibilityService`                    | Y        | **Keep** (on service)                                                                                                                                                 |
+| `SYSTEM_ALERT_WINDOW`            | Floating overlay assistant                     | N        | **Removed** — no RN overlay shipping; also stripped via `tools:node="remove"` so React Native’s **debug**-only merge (`ReactAndroid/src/debug`) cannot reintroduce it |
+| `RECORD_AUDIO`                   | Wake word / STT                                | N        | **Removed** — Phase 2 voice; re-add with that task                                                                                                                    |
+| `READ_CONTACTS`                  | Contact pick / dial-by-name                    | N        | **Removed** — no shipping feature reads contacts                                                                                                                      |
+| `WRITE_CONTACTS`                 | Contact mutation                               | N        | **Removed** — no shipping feature writes contacts                                                                                                                     |
+| `WRITE_SETTINGS`                 | System setting changes                         | N        | **Removed** — no shipping feature modifies Settings                                                                                                                   |
+| `MODIFY_AUDIO_SETTINGS`          | Volume / routing                               | N        | **Removed** — no shipping audio-routing feature                                                                                                                       |
+| `SET_ALARM`                      | AlarmClock intents                             | N        | **Removed** — no shipping alarm feature                                                                                                                               |
 
 **Post-trim count (SC002):** 8 `<uses-permission>` + a11y bind on service.
 
@@ -98,7 +98,7 @@ are requested **at the point of use** with an on-screen rationale, not batched a
   query) — contacts / write-settings / overlay were dropped in SC002.
 - Grant or revoke the accessibility service in system Settings (user already unlocked).
 
-**What they do *not* get “for free” from PrivateAgent alone**
+**What they do _not_ get “for free” from PrivateAgent alone**
 
 - Remote control from another network (no external control channel — see §3).
 - Bypass of Android’s lock screen if the device is locked (out of scope of this model;
@@ -119,10 +119,10 @@ are requested **at the point of use** with an on-screen rationale, not batched a
 - Attempt to bind or confuse the accessibility service — binding requires
   `BIND_ACCESSIBILITY_SERVICE`, which normal third-party apps do not hold; the system is the
   binder. A malicious app **cannot** simply call our service as if it were a public API.
-- Abuse **overlay** *if the malicious app has `SYSTEM_ALERT_WINDOW` itself* to socially
+- Abuse **overlay** _if the malicious app has `SYSTEM_ALERT_WINDOW` itself_ to socially
   engineer the user (classic tapjacking / fake UI) while PrivateAgent or Settings is open —
   platform-wide class of attack; PrivateAgent no longer holds overlay permission (SC002).
-- Read world-readable logs or misuse accessibility *of its own* if the user also enables a
+- Read world-readable logs or misuse accessibility _of its own_ if the user also enables a
   malicious accessibility service (user-granted; outside our process).
 - If our native module or JS accidentally exposes an exported, unauthenticated IPC surface
   later, that would expand this class — **do not add exported receivers/services/providers
@@ -132,7 +132,7 @@ are requested **at the point of use** with an on-screen rationale, not batched a
 
 - Not automatic control of our accessibility gestures via our process, unless we ship a
   buggy exported bridge.
-- Significant risk if the user enables a *second* malicious accessibility service, or if we
+- Significant risk if the user enables a _second_ malicious accessibility service, or if we
   later add an unauthenticated remote/local IPC trigger.
 
 **Mitigations**
@@ -173,15 +173,15 @@ with Settings → Accessibility already granted to us.
 ## 3. Control channel — **decision: in-app only**
 
 **Decision (2026-09-06, SC001):** The only authorized way to trigger agent actions is
-**inside the PrivateAgent app UI** (and later, in-app voice *within this process* once
+**inside the PrivateAgent app UI** (and later, in-app voice _within this process_ once
 Phase 2 ships). There is **no remote or cross-app control channel**.
 
-| Option | Status |
-|---|---|
-| Telegram / chat bots | **Removed — not returning in this task** |
-| Other remote push / third-party messenger | **Not adopted** |
-| Exported Intent / bound service for other apps | **Not adopted** |
-| **In-app UI only** | **Selected** |
+| Option                                         | Status                                   |
+| ---------------------------------------------- | ---------------------------------------- |
+| Telegram / chat bots                           | **Removed — not returning in this task** |
+| Other remote push / third-party messenger      | **Not adopted**                          |
+| Exported Intent / bound service for other apps | **Not adopted**                          |
+| **In-app UI only**                             | **Selected**                             |
 
 **Remote allow-list / deny-by-default auth:** **Not applicable** — there is no remote
 caller. If a future product decision adds an external channel (e.g. Azure hub commands in
@@ -224,10 +224,10 @@ must **not** be enough without that confirmation gate.
 Every agent action executed on-device (bridge calls that mutate UI or read screen dumps used
 to drive a goal, plus high-level goal start/finish) **must** be logged locally with at least:
 
-- UTC timestamp  
-- Action type / method name  
-- Outcome (success / failure / rejected)  
-- Correlation id for the goal/session when available  
+- UTC timestamp
+- Action type / method name
+- Outcome (success / failure / rejected)
+- Correlation id for the goal/session when available
 
 Logs must **not** include secrets, full password fields, or raw token material. Screen-dump
 payloads should be omitted or heavily redacted in the durable log.
@@ -249,13 +249,13 @@ review risk. Personal / fleet sideload matches the desk-companion use case (Vivo
 
 ## 8. Summary for reviewers
 
-| Topic | Recorded answer |
-|---|---|
-| Threat model (a)(b)(c) | §2 |
-| Control channel | **In-app only** — no remote trigger (§3) |
-| Remote allow-list | **N/A** until a remote channel is product-approved |
-| Secrets | Keystore / secure storage only (§4) |
-| Destructive actions | In-app confirmation required (§5) |
-| Audit log | Required; timestamped; no secrets (§6) |
-| Play Store | **Sideload-only** (§7) |
-| Manifest | SC002 trimmed to 8 `<uses-permission>` + a11y bind (§1.2); contacts / write-settings / overlay / mic / audio / alarm dropped |
+| Topic                  | Recorded answer                                                                                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Threat model (a)(b)(c) | §2                                                                                                                           |
+| Control channel        | **In-app only** — no remote trigger (§3)                                                                                     |
+| Remote allow-list      | **N/A** until a remote channel is product-approved                                                                           |
+| Secrets                | Keystore / secure storage only (§4)                                                                                          |
+| Destructive actions    | In-app confirmation required (§5)                                                                                            |
+| Audit log              | Required; timestamped; no secrets (§6)                                                                                       |
+| Play Store             | **Sideload-only** (§7)                                                                                                       |
+| Manifest               | SC002 trimmed to 8 `<uses-permission>` + a11y bind (§1.2); contacts / write-settings / overlay / mic / audio / alarm dropped |

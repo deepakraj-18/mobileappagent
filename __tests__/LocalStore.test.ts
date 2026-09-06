@@ -1,4 +1,8 @@
-import { AppLimits, EventLogLevel, OutboxStatus } from '../src/constants/appConstants';
+import {
+  AppLimits,
+  EventLogLevel,
+  OutboxStatus,
+} from '../src/constants/appConstants';
 import { LocalStore } from '../src/store/LocalStore';
 import { createFakeCompanionDb } from '../src/store/testing/fakeDb';
 
@@ -14,13 +18,15 @@ describe('LocalStore DAOs', () => {
     await store.outbox.ack(a);
     const second = await store.outbox.nextPending();
     expect(second?.id).toBe(b);
-    expect(
-      fake.tables.hub_outbox.find(r => String(r.id) === a)?.status,
-    ).toBe(OutboxStatus.ACKED);
+    expect(fake.tables.hub_outbox.find(r => String(r.id) === a)?.status).toBe(
+      OutboxStatus.ACKED,
+    );
   });
 
   it('stores cache kv and dock cards', async () => {
-    const store = await LocalStore.fromExecutorMigrated(createFakeCompanionDb());
+    const store = await LocalStore.fromExecutorMigrated(
+      createFakeCompanionDb(),
+    );
     await store.cache.set('cfg', { x: 1 });
     expect(await store.cache.get('cfg')).toEqual({ x: 1 });
     await store.cache.setCards([{ id: 'c1', kind: 'INFO' }]);
@@ -28,7 +34,9 @@ describe('LocalStore DAOs', () => {
   });
 
   it('appends event log and returns recent', async () => {
-    const store = await LocalStore.fromExecutorMigrated(createFakeCompanionDb());
+    const store = await LocalStore.fromExecutorMigrated(
+      createFakeCompanionDb(),
+    );
     await store.events.append(EventLogLevel.INFO, 'boot', 'hello');
     const recent = await store.events.recent(10);
     expect(recent[0]?.message).toBe('hello');

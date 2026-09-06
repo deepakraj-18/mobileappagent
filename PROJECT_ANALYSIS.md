@@ -4,7 +4,7 @@
 > **Target Project:** `private_agent` (Mobile App Agent)  
 > **Platform:** Android (minSdk 26 / Android 8.0+)  
 > **Framework:** Flutter (Dart `>=3.12.2`) with native Android Kotlin services  
-> **New Feature Specification:** Local Multi-Device Mesh, Device Selection List & Telegram-Style In-App Remote Chat  
+> **New Feature Specification:** Local Multi-Device Mesh, Device Selection List & Telegram-Style In-App Remote Chat
 
 ---
 
@@ -13,6 +13,7 @@
 **PrivateAgent** is an on-device, privacy-preserving autonomous agent for Android. It bridges standard **OpenAI-compatible Large Language Models (LLMs)** with the **Android Accessibility API** to create a self-directed agent capable of observing, reasoning about, and interacting with arbitrary mobile applications without needing custom APIs or root access.
 
 ### Core Value Propositions
+
 - **Privacy by Design:** Prompts and responses only flow to the user-configured LLM endpoint (which can be a 100% local/offline Ollama instance). All task histories, macros, and configuration settings are persisted strictly on-device in `SharedPreferences`.
 - **Zero-Token Replay (Skill Memory):** Successful task runs can be saved as deterministic macros that can be replayed on demand without consuming LLM tokens.
 - **Local Multi-Device Remote Control (NEW):** Instead of relying on a third-party Telegram bot or cloud relay, PrivateAgent devices discover each other over local Wi-Fi. Users can select any connected device from a list and interact with it through a rich, dedicated **Telegram-style chat interface** to dispatch goals, monitor live step reasoning, and view screen snapshots.
@@ -92,7 +93,9 @@
 ## 3. Local Multi-Device Remote Control Subsystem (Detailed Spec)
 
 ### 3.1 Motivation & Comparison with Telegram
+
 In the original architecture, remote control was handled through a long-polling **Telegram bot** (`telegram_service.dart`):
+
 - **Limitations of Telegram:**
   - Requires public internet access and Telegram API servers.
   - Requires creating a Telegram Bot token and knowing user Chat IDs.
@@ -105,11 +108,13 @@ In the original architecture, remote control was handled through a long-polling 
   - **Rich In-App UX:** Custom Telegram-style UI with quick-action shortcut buttons, live status indicators, and full voice integration.
 
 ### 3.2 Device Roles & Topology
+
 - **Dual-Role Model:** Every instance of the app acts as both:
   1. **A Server / Worker Agent:** Broadcasts its presence, listens for incoming connections, and executes tasks on its own screen via its Accessibility Service.
   2. **A Client / Controller:** Discovers other devices on the network and connects to them via a dedicated chat page to control them remotely.
 
 ### 3.3 Discovery, Pairing & Security Protocol
+
 1. **Discovery (mDNS / UDP Broadcast):**
    - Each device advertises a local service (e.g. `_privateagent._tcp`) containing:
      - `deviceId`: Unique persistent UUID.
@@ -131,14 +136,17 @@ In the original architecture, remote control was handled through a long-polling 
    - Upon approval, an authentication token is exchanged and saved in `SharedPreferences`. Subsequent connections from paired devices are automatically accepted.
 
 ### 3.4 WebSocket Communication Protocol
+
 Communication occurs over a bidirectional WebSocket connection using lightweight JSON payloads:
 
 #### Controller → Target:
+
 - **`pair_request`**: `{ "type": "pair_request", "clientName": "Laptop/Phone", "clientId": "uuid" }`
 - **`start_task`**: `{ "type": "start_task", "goal": "Open WhatsApp and message Alice" }`
 - **`command`**: `{ "type": "command", "cmd": "status" | "screenshot" | "pause" | "resume" | "cancel" }`
 
 #### Target → Controller:
+
 - **`pair_response`**: `{ "type": "pair_response", "accepted": true, "token": "auth_token" }`
 - **`status_update`**: `{ "type": "status_update", "state": "running" | "idle", "step": 3, "goal": "..." }`
 - **`step_log`**: `{ "type": "step_log", "step": 3, "role": "agent", "action": "click_text", "reasoning": "Tapping search bar" }`
@@ -150,14 +158,16 @@ Communication occurs over a bidirectional WebSocket connection using lightweight
 ## 4. In-App User Interface Specification
 
 ### 4.1 "Devices" Tab / Screen (`lib/screens/devices/devices_screen.dart`)
+
 - **Device Cards List:** Shows all discovered and previously paired devices on the local Wi-Fi.
-  - Device Name & Model (e.g., *"Living Room Tablet (Galaxy Tab S8)"*).
+  - Device Name & Model (e.g., _"Living Room Tablet (Galaxy Tab S8)"_).
   - Connection Status Chip: `Online` (green), `Offline` (grey), `Connecting` (amber).
   - Agent State Chip: `Idle` (blue) or `Executing Goal: ...` (purple).
   - Health Indicators: Battery level, Wi-Fi signal, Accessibility Service status (`Active ✅` / `Disabled ❌`).
 - **Quick Actions:** Tap card to open the **Telegram-style Remote Chat**; pull-to-refresh to re-scan mDNS.
 
 ### 4.2 Telegram-Style Remote Device Chat (`lib/screens/devices/device_chat_screen.dart`)
+
 - **App Bar:**
   - Target device avatar, name, and real-time status subtitle (`Online • Ready`, or `Running step 4/25`).
   - Device info popover (IP address, paired status, disconnect option).
@@ -172,7 +182,7 @@ Communication occurs over a bidirectional WebSocket connection using lightweight
   - ⏹️ **`/cancel` Button:** Instantly aborts the remote task in progress.
   - ⏸️ **Pause / Resume:** Temporarily freezes or unfreezes the target's loop.
 - **Message Input Area:**
-  - Text input for natural language goals (e.g., *"Open Spotify and play my Liked Songs"*).
+  - Text input for natural language goals (e.g., _"Open Spotify and play my Liked Songs"_).
   - 🎙️ **Voice Mic Button:** Direct speech-to-text to dictate goals hands-free.
   - Send button dispatches the goal directly over the local WebSocket.
 
@@ -181,7 +191,9 @@ Communication occurs over a bidirectional WebSocket connection using lightweight
 ## 5. Core Agent Mechanics (Observe → Think → Act)
 
 ### 5.1 Screen Observation & Serialization (`AgentAccessibilityService.kt` & `screen_node.dart`)
+
 Instead of heavy raw image screenshots that consume massive vision model tokens and introduce latency, PrivateAgent queries Android's `AccessibilityNodeInfo` tree directly:
+
 - **Filtering:** Filters out non-interactive elements and invisible containers, keeping only actionable widgets (clickable, editable, scrollable, checkable) or widgets with visible labels.
 - **Serialization Format:** Each visible element is encoded as a single concise text line:
   ```text
@@ -190,6 +202,7 @@ Instead of heavy raw image screenshots that consume massive vision model tokens 
 - **Context Preservation:** Prevents self-reference loops by skipping PrivateAgent's own UI window if a foreign application window is active in the background.
 
 ### 5.2 Cognitive Decision Loop (`task_executor.dart` & `ai_service.dart`)
+
 - **Autonomous Execution on Target:** The target device runs the full loop autonomously:
   1. Accessibility tree dump.
   2. LLM reasoning (via target's configured provider or local Ollama).
@@ -197,12 +210,15 @@ Instead of heavy raw image screenshots that consume massive vision model tokens 
   4. Streams every step and screenshot back to the Controller's chat page in real time.
 
 ### 5.3 Recovery Engine (`recovery_engine.dart`)
+
 Monitors the execution state after every turn:
+
 - **Stagnation Detection:** Compares consecutive screen dumps to check if the screen failed to change following an action.
 - **Repetition Detection:** Flags repeated failed attempts on identical UI elements.
 - **Autonomous Mitigation:** Automatically suggests corrective operations (e.g. scroll forward to reveal content, swipe back, or invoke alternative navigation).
 
 ### 5.4 Skill Memory & Macro Replay (`skill_memory_service.dart`)
+
 - Once a goal succeeds through the AI loop, the sequence of successful `TaskStep` commands is recorded into a `Skill` schema.
 - When matched, the task bypasses LLM inference entirely, replaying the stored sequence at rapid step intervals (0 tokens spent).
 
@@ -210,16 +226,16 @@ Monitors the execution state after every turn:
 
 ## 6. Technology Stack & Planned Dependencies
 
-| Category | Existing / Added Libraries | Role |
-|---|---|---|
-| **Framework** | Flutter / Dart 3.12.2+ | Cross-platform UI and reactive state management |
-| **Native Bridge** | Android Kotlin, MethodChannel | Accessibility services, screen dumps, gesture simulation |
-| **Local Discovery (NEW)** | `nsd` or `bonsoir` | ZeroConf / mDNS local network service broadcast and discovery |
-| **Local WebSockets (NEW)**| `shelf_web_socket`, `web_socket_channel` | Local embedded WebSocket server and client for P2P connection |
-| **Voice / Speech** | `speech_to_text`, `flutter_tts` | Voice command parsing and spoken responses |
-| **System Integrations** | `installed_apps`, `android_intent_plus`, `url_launcher` | App discovery, execution, intent launching |
-| **Permissions & Storage** | `permission_handler`, `shared_preferences` | System permissions, local state and macro persistence |
-| **Overlay UI** | `flutter_overlay_window` | System alert window floating UI |
+| Category                   | Existing / Added Libraries                              | Role                                                          |
+| -------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- |
+| **Framework**              | Flutter / Dart 3.12.2+                                  | Cross-platform UI and reactive state management               |
+| **Native Bridge**          | Android Kotlin, MethodChannel                           | Accessibility services, screen dumps, gesture simulation      |
+| **Local Discovery (NEW)**  | `nsd` or `bonsoir`                                      | ZeroConf / mDNS local network service broadcast and discovery |
+| **Local WebSockets (NEW)** | `shelf_web_socket`, `web_socket_channel`                | Local embedded WebSocket server and client for P2P connection |
+| **Voice / Speech**         | `speech_to_text`, `flutter_tts`                         | Voice command parsing and spoken responses                    |
+| **System Integrations**    | `installed_apps`, `android_intent_plus`, `url_launcher` | App discovery, execution, intent launching                    |
+| **Permissions & Storage**  | `permission_handler`, `shared_preferences`              | System permissions, local state and macro persistence         |
+| **Overlay UI**             | `flutter_overlay_window`                                | System alert window floating UI                               |
 
 ---
 

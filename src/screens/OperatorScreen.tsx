@@ -11,7 +11,9 @@ export function OperatorScreen(): React.JSX.Element {
       const enabled = await Accessibility.isServiceEnabled();
       setServiceOn(enabled);
       const size = await Accessibility.getScreenSize();
-      setStatus(`a11y=${enabled ? 'ON' : 'OFF'} · ${size.width}×${size.height}`);
+      setStatus(
+        `a11y=${enabled ? 'ON' : 'OFF'} · ${size.width}×${size.height}`,
+      );
     } catch (e) {
       setStatus(`error: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -20,11 +22,14 @@ export function OperatorScreen(): React.JSX.Element {
   return (
     <View style={styles.root}>
       <Text style={styles.title}>Operator</Text>
-      <Text style={styles.sub}>In-app control only — drive the a11y bridge here.</Text>
+      <Text style={styles.sub}>
+        In-app control only — drive the a11y bridge here.
+      </Text>
       <View style={styles.card}>
         <Text style={styles.cardText}>{status}</Text>
         <Text style={styles.cardText}>
-          Service: {serviceOn == null ? '—' : serviceOn ? 'enabled' : 'disabled'}
+          Service:{' '}
+          {serviceOn == null ? '—' : serviceOn ? 'enabled' : 'disabled'}
         </Text>
       </View>
       <Pressable style={styles.btn} onPress={refresh}>
@@ -32,7 +37,8 @@ export function OperatorScreen(): React.JSX.Element {
       </Pressable>
       <Pressable
         style={[styles.btn, styles.secondary]}
-        onPress={() => Accessibility.openAccessibilitySettings()}>
+        onPress={() => Accessibility.openAccessibilitySettings()}
+      >
         <Text style={styles.btnText}>Open accessibility settings</Text>
       </Pressable>
     </View>

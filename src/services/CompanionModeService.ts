@@ -28,7 +28,9 @@ class CompanionModeServiceImpl {
   async hydrate(): Promise<CompanionMode> {
     const raw = await AsyncStorage.getItem(KEY);
     this.mode =
-      raw === CompanionMode.DOCKED ? CompanionMode.DOCKED : CompanionMode.OPERATOR;
+      raw === CompanionMode.DOCKED
+        ? CompanionMode.DOCKED
+        : CompanionMode.OPERATOR;
     this.hydrated = true;
     if (this.mode === CompanionMode.DOCKED) {
       void CompanionRuntime.start();

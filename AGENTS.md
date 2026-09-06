@@ -44,8 +44,8 @@ app, both current, both kept in sync:**
    (`SC001`/`SC002`, in the parent's numbering — don't confuse these with this repo's own
    `SC001`–`SC008` in Phase 1, which are different tasks despite the shared prefix).
 
-Read both `plan.md`s. This repo's own describes *what* the app does; the parent's covers *how
-this repo relates to the rest of the workspace* (nothing today, by design — see §1).
+Read both `plan.md`s. This repo's own describes _what_ the app does; the parent's covers _how
+this repo relates to the rest of the workspace_ (nothing today, by design — see §1).
 
 **Someone else reviews your submission independently before it counts as done.** You may set
 `Status: Review`. You may never set `Status: PASS`. This is enforced at commit time (parent
@@ -64,19 +64,19 @@ shared auth, no shared data. Treat it as its own product sharing this workspace 
 invent integration work that isn't in an approved task.
 
 **The consequence that shapes every decision here:** this app is granted
-`BIND_ACCESSIBILITY_SERVICE`, meaning it can read and act on the content of *every screen in
-every app on the device* — including the user's password manager and banking apps. A bug here
+`BIND_ACCESSIBILITY_SERVICE`, meaning it can read and act on the content of _every screen in
+every app on the device_ — including the user's password manager and banking apps. A bug here
 is not cosmetic; it is a path to full device compromise. Treat every change to permission
 handling, command authorization, or the accessibility service itself as security-critical, not
 routine.
 
 ## 2. Stack and structure
 
-| Layer | Technology |
-|---|---|
-| App | **React Native** (Community CLI — never Expo's scaffold/runtime) |
-| Native | Kotlin (Android), `minSdk 26` |
-| AI backend | Ollama, self-hosted (or per `BD003`) |
+| Layer          | Technology                                                                                    |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| App            | **React Native** (Community CLI — never Expo's scaffold/runtime)                              |
+| Native         | Kotlin (Android), `minSdk 26`                                                                 |
+| AI backend     | Ollama, self-hosted (or per `BD003`)                                                          |
 | Remote control | **None currently** — Telegram removed; see `SC001`/`BD002` for what, if anything, replaces it |
 
 ```
@@ -92,7 +92,7 @@ android/
 - **Scaffold and runtime: Community CLI, never Expo.** No `expo init`, `expo start`,
   `import { ... } from 'expo'`, or `expo` in `package.json` dependencies. Individual `expo-*`
   packages (`expo-camera`, etc.) are fine if genuinely needed — install with `npm install
-  expo-*`, never `expo install`.
+expo-*`, never `expo install`.
 - Function components with hooks only. No class components.
 - Typed navigation if/when multiple screens exist (`React Navigation`, not `expo-router`).
 - No web APIs (`window`, `document`). Use `Dimensions`, `Platform`, `AppState`.
@@ -110,7 +110,7 @@ npx jest
 ```
 
 **No verified build baseline exists yet until `IF004` completes.** If you are working on
-`IF004` itself, establishing that baseline *is* the task — don't assume a prior "0 errors"
+`IF004` itself, establishing that baseline _is_ the task — don't assume a prior "0 errors"
 claim without re-running it yourself, and don't claim one without having actually run it.
 
 ---
@@ -136,6 +136,7 @@ This is the one task in this repo that legitimately deletes a large amount of so
 **pre-authorized and already backed up** (see the top of this file) — you do not need to ask
 before removing `lib/`, `pubspec.yaml`, or Flutter's Android wiring as part of `IF004`
 specifically. You **do** still need to:
+
 1. Verify both backups exist first (the task file spells out the exact commands)
 2. Preserve `AgentAccessibilityService.kt` and `AndroidManifest.xml` — don't delete these
 3. Scope the deletion to Flutter-specific files only — don't run a blanket `rm -rf` over the
@@ -177,9 +178,10 @@ its criteria are met.
 
 ## 5. Project-specific traps
 
-*Populated from review findings as they occur.*
+_Populated from review findings as they occur._
 
 **Known at project start (2026-09-06):**
+
 - This repo was Flutter until 2026-09-06. Any documentation, comment, or prior task referring
   to Dart files, `pubspec.yaml`, or Flutter commands describes the **pre-rewrite** state — the
   archive (`archive/flutter-final` tag) is where that code now lives, not the working tree.
@@ -220,7 +222,7 @@ parent then updates its own pointer separately.
 **Sequence: gate tasks first.** `IF004` (React Native scaffold + Flutter cleanup — start
 here) → `SC001` (threat model + control-channel design, parent numbering) → `SC002`
 (permission audit, parent numbering) → **then** this repo's own Phase 1 (`IF001`, `IF002`,
-`SC001`–`SC008` — a *different* `SC001`, don't confuse it with the parent's — `DB001`,
+`SC001`–`SC008` — a _different_ `SC001`, don't confuse it with the parent's — `DB001`,
 `BD013`).
 
 The parent's `BD002` (day-one capability set) and `BD003` (integration posture) are

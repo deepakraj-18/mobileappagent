@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CompanionMode, EventLogLevel } from '../constants/appConstants';
 import { CompanionModeService } from '../services/CompanionModeService';
 import { LocalStore } from '../store/LocalStore';
@@ -68,7 +62,10 @@ export function CompanionHealthScreen({ onBack }: Props): React.JSX.Element {
         <Pressable style={styles.btn} onPress={refresh}>
           <Text style={styles.btnText}>Refresh</Text>
         </Pressable>
-        <Pressable style={[styles.btn, styles.secondary]} onPress={injectTestFailure}>
+        <Pressable
+          style={[styles.btn, styles.secondary]}
+          onPress={injectTestFailure}
+        >
           <Text style={styles.btnText}>Log test error</Text>
         </Pressable>
       </View>

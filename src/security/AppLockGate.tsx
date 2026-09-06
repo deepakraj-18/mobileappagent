@@ -24,10 +24,7 @@ export function AppLockGate({ children }: Props): React.JSX.Element {
   useEffect(() => {
     let last: AppStateStatus = AppState.currentState;
     const sub = AppState.addEventListener('change', next => {
-      if (
-        (last === 'background' || last === 'inactive') &&
-        next === 'active'
-      ) {
+      if ((last === 'background' || last === 'inactive') && next === 'active') {
         AppLock.lock();
       }
       last = next;
@@ -59,7 +56,8 @@ export function AppLockGate({ children }: Props): React.JSX.Element {
       <Pressable
         style={[styles.btn, busy && styles.btnDisabled]}
         disabled={busy}
-        onPress={unlock}>
+        onPress={unlock}
+      >
         <Text style={styles.btnText}>{busy ? 'Waiting…' : 'Unlock'}</Text>
       </Pressable>
     </View>

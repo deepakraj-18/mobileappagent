@@ -15,17 +15,21 @@ export function SettingsScreen({
   return (
     <View style={styles.root}>
       <Text style={styles.title}>Settings</Text>
-      <Text style={styles.sub}>Companion mode toggle opens the Dock route.</Text>
+      <Text style={styles.sub}>
+        Companion mode toggle opens the Dock route.
+      </Text>
       <Text
         style={styles.link}
         onPress={onToggleCompanion}
-        accessibilityRole="button">
+        accessibilityRole="button"
+      >
         {companionDocked ? 'Exit docked companion' : 'Enter docked companion'}
       </Text>
       <Text
         style={styles.link}
         onPress={onOpenHealth}
-        accessibilityRole="button">
+        accessibilityRole="button"
+      >
         Companion health
       </Text>
     </View>

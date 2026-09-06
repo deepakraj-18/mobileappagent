@@ -9,8 +9,8 @@ automation agent. It observes the screen through Android's Accessibility
 Service, reasons about what it sees with an LLM of your choice, and acts —
 tapping, typing, and swiping — until your goal is accomplished.
 
-*Your keys. Your data. Your device. Nothing leaves your phone except LLM calls
-you configure yourself.*
+_Your keys. Your data. Your device. Nothing leaves your phone except LLM calls
+you configure yourself._
 
 </div>
 
@@ -18,18 +18,18 @@ you configure yourself.*
 
 ## ✨ Features
 
-| Capability | Description |
-|---|---|
-| 🤖 **Autonomous task execution** | Observe → think → act feedback loop: dumps the visible UI, asks the LLM for one JSON action, executes it, and repeats until the goal is done (with step caps and repeat-action detection). |
-| 🧠 **Skill memory (macro replay)** | Successful action sequences are stored locally per goal. Repeated tasks replay as macros — zero LLM tokens spent. |
-| 🔌 **Any OpenAI-compatible LLM** | Works with DeepSeek, OpenRouter, NVIDIA NIM, Ollama (fully local), or a custom base URL. |
-| ♿ **Screen automation** | Native Android accessibility service for screen dumps, taps, text input, swipes, back/home gestures, and screenshots. |
-| 📱 **Telegram remote control** | Drive your phone from anywhere via a Telegram bot — send goals, get status updates and screenshots back. |
-| 🎙️ **Voice interface** | Speech-to-text input and text-to-speech replies. |
-| 🪟 **Overlay assistant** | Floating overlay window to launch tasks from any app. |
-| 🔁 **Recovery engine** | Detects stuck states and autonomously recovers (retry, scroll, back out). |
-| 🔐 **Private by design** | All state (settings, skills, history) stays on-device via `SharedPreferences`. No telemetry, no third-party analytics. |
-| ⚙️ **System control** | Volume, brightness, app launching, intents, sharing, and notifications. |
+| Capability                         | Description                                                                                                                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 🤖 **Autonomous task execution**   | Observe → think → act feedback loop: dumps the visible UI, asks the LLM for one JSON action, executes it, and repeats until the goal is done (with step caps and repeat-action detection). |
+| 🧠 **Skill memory (macro replay)** | Successful action sequences are stored locally per goal. Repeated tasks replay as macros — zero LLM tokens spent.                                                                          |
+| 🔌 **Any OpenAI-compatible LLM**   | Works with DeepSeek, OpenRouter, NVIDIA NIM, Ollama (fully local), or a custom base URL.                                                                                                   |
+| ♿ **Screen automation**           | Native Android accessibility service for screen dumps, taps, text input, swipes, back/home gestures, and screenshots.                                                                      |
+| 📱 **Telegram remote control**     | Drive your phone from anywhere via a Telegram bot — send goals, get status updates and screenshots back.                                                                                   |
+| 🎙️ **Voice interface**             | Speech-to-text input and text-to-speech replies.                                                                                                                                           |
+| 🪟 **Overlay assistant**           | Floating overlay window to launch tasks from any app.                                                                                                                                      |
+| 🔁 **Recovery engine**             | Detects stuck states and autonomously recovers (retry, scroll, back out).                                                                                                                  |
+| 🔐 **Private by design**           | All state (settings, skills, history) stays on-device via `SharedPreferences`. No telemetry, no third-party analytics.                                                                     |
+| ⚙️ **System control**              | Volume, brightness, app launching, intents, sharing, and notifications.                                                                                                                    |
 
 ## 🏗️ How it works
 
@@ -113,16 +113,16 @@ flutter run
 3. Enable the **PrivateAgent Accessibility Service** in Android settings when
    prompted — this is required for screen automation.
 4. (Optional) Configure the **Telegram bot** token for remote control.
-5. Give it a goal — e.g. *"Open WhatsApp and send 'hi' to Mom"* — and watch it
+5. Give it a goal — e.g. _"Open WhatsApp and send 'hi' to Mom"_ — and watch it
    work.
 
 ### Telegram commands
 
-| Command | Action |
-|---|---|
-| `/status` | Current task state + accessibility service status |
-| `/screenshot` | Capture and send the current screen |
-| *(any text)* | Executed as an agent task |
+| Command       | Action                                            |
+| ------------- | ------------------------------------------------- |
+| `/status`     | Current task state + accessibility service status |
+| `/screenshot` | Capture and send the current screen               |
+| _(any text)_  | Executed as an agent task                         |
 
 ## 🛠️ Development
 

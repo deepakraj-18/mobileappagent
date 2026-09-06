@@ -1,6 +1,8 @@
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 
-const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
+const rnBiometrics = new ReactNativeBiometrics({
+  allowDeviceCredentials: true,
+});
 
 export type UnlockResult = { ok: true } | { ok: false; reason: string };
 
@@ -24,7 +26,8 @@ class AppLockImpl {
 
   async unlock(prompt = 'Unlock PrivateAgent'): Promise<UnlockResult> {
     try {
-      const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+      const { available, biometryType } =
+        await rnBiometrics.isSensorAvailable();
       if (!available) {
         // Sideload desk phone without enrolled biometrics: allow continue with warning.
         this.locked = false;

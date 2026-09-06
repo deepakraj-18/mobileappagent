@@ -29,7 +29,9 @@ export class LocalStore {
     return new LocalStore(executor);
   }
 
-  static async fromExecutorMigrated(executor: SqlExecutor): Promise<LocalStore> {
+  static async fromExecutorMigrated(
+    executor: SqlExecutor,
+  ): Promise<LocalStore> {
     await applyMigrations(executor);
     return new LocalStore(executor);
   }

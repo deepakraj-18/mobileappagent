@@ -40,11 +40,16 @@ export function createFakeCompanionDb(): SqlExecutor & {
       }
 
       if (upper.startsWith('INSERT OR REPLACE INTO SCHEMA_MIGRATIONS')) {
-        tables.schema_migrations = [{ version: params[0], applied_at: params[1] }];
+        tables.schema_migrations = [
+          { version: params[0], applied_at: params[1] },
+        ];
         return { rows: [] };
       }
 
-      if (upper.startsWith('CREATE TABLE') || upper.startsWith('CREATE INDEX')) {
+      if (
+        upper.startsWith('CREATE TABLE') ||
+        upper.startsWith('CREATE INDEX')
+      ) {
         return { rows: [] };
       }
 
@@ -89,11 +94,16 @@ export function createFakeCompanionDb(): SqlExecutor & {
         return { rows: [] };
       }
 
-      if (upper.includes('FROM HUB_OUTBOX') && upper.includes('WHERE STATUS =')) {
+      if (
+        upper.includes('FROM HUB_OUTBOX') &&
+        upper.includes('WHERE STATUS =')
+      ) {
         const status = params[0];
         const ordered = [...tables.hub_outbox]
           .filter(r => r.status === status)
-          .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+          .sort((a, b) =>
+            String(a.created_at).localeCompare(String(b.created_at)),
+          );
         const row = ordered[0];
         if (!row) {
           return { rows: [] };
@@ -112,7 +122,10 @@ export function createFakeCompanionDb(): SqlExecutor & {
         };
       }
 
-      if (upper.startsWith('UPDATE HUB_OUTBOX SET STATUS') && upper.includes('ATTEMPTS')) {
+      if (
+        upper.startsWith('UPDATE HUB_OUTBOX SET STATUS') &&
+        upper.includes('ATTEMPTS')
+      ) {
         const row = tables.hub_outbox.find(r => r.id === params[2]);
         if (row) {
           row.status = params[0];
@@ -122,7 +135,10 @@ export function createFakeCompanionDb(): SqlExecutor & {
         return { rows: [] };
       }
 
-      if (upper.startsWith('UPDATE HUB_OUTBOX SET STATUS') && !upper.includes('ATTEMPTS')) {
+      if (
+        upper.startsWith('UPDATE HUB_OUTBOX SET STATUS') &&
+        !upper.includes('ATTEMPTS')
+      ) {
         if (upper.includes('WHERE ID IN')) {
           // cap drop — params: DROPPED, ts, PENDING, IN_FLIGHT, FAILED, limit
           const limit = Number(params[5] ?? 0);
@@ -176,7 +192,10 @@ export function createFakeCompanionDb(): SqlExecutor & {
         };
       }
 
-      if (upper.includes('FROM EVENT_LOG') && upper.includes('ORDER BY CREATED_AT DESC')) {
+      if (
+        upper.includes('FROM EVENT_LOG') &&
+        upper.includes('ORDER BY CREATED_AT DESC')
+      ) {
         const limit = Number(params[0] ?? 50);
         const rows = [...tables.event_log]
           .sort((a, b) =>

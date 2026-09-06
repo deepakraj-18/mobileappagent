@@ -94,13 +94,13 @@ enable until that feature ships. Path when needed:
 
 ## 5. Verification
 
-| Check | How |
-|---|---|
-| Package installed | `adb shell pm path com.privateagent` |
-| App launches | `adb shell am start -n com.privateagent/.MainActivity` |
-| A11y on | In-app bridge status `a11y=ON` |
-| Autostart | After reboot, with companion mode on (SC005), FGS should return — once Phase 1 SC004/SC005 land |
-| Overnight | Leave docked + charging; confirm companion notification still present next morning (QA060) |
+| Check             | How                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| Package installed | `adb shell pm path com.privateagent`                                                            |
+| App launches      | `adb shell am start -n com.privateagent/.MainActivity`                                          |
+| A11y on           | In-app bridge status `a11y=ON`                                                                  |
+| Autostart         | After reboot, with companion mode on (SC005), FGS should return — once Phase 1 SC004/SC005 land |
+| Overnight         | Leave docked + charging; confirm companion notification still present next morning (QA060)      |
 
 ---
 

@@ -24,7 +24,8 @@ export const PresenceSource = {
   MANUAL: 'MANUAL',
   VOICE: 'VOICE',
 } as const;
-export type PresenceSource = (typeof PresenceSource)[keyof typeof PresenceSource];
+export type PresenceSource =
+  (typeof PresenceSource)[keyof typeof PresenceSource];
 
 /** Local wake-word / voice session state (Phase 2 will drive transitions). */
 export const WakeState = {
