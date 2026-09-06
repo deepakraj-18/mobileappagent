@@ -17,7 +17,7 @@ jest.mock('../src/native/Accessibility', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () => {
-  let store: Record<string, string> = {};
+  const store: Record<string, string> = {};
   return {
     setItem: jest.fn(async (k: string, v: string) => {
       store[k] = v;
@@ -27,7 +27,7 @@ jest.mock('@react-native-async-storage/async-storage', () => {
       delete store[k];
     }),
     clear: jest.fn(async () => {
-      store = {};
+      Object.keys(store).forEach(k => delete store[k]);
     }),
   };
 });
@@ -35,6 +35,25 @@ jest.mock('@react-native-async-storage/async-storage', () => {
 jest.mock('react-native-screens', () => ({
   enableScreens: jest.fn(),
   Screen: ({ children }: { children?: React.ReactNode }) => children ?? null,
+}));
+
+jest.mock('react-native-biometrics', () => ({
+  __esModule: true,
+  default: function MockBiometrics() {
+    return {
+      isSensorAvailable: async () => ({ available: false }),
+      simplePrompt: async () => ({ success: true }),
+    };
+  },
+  BiometryTypes: {
+    TouchID: 'TouchID',
+    FaceID: 'FaceID',
+    Biometrics: 'Biometrics',
+  },
+}));
+
+jest.mock('../src/security/AppLockGate', () => ({
+  AppLockGate: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 test('renders navigation shell', async () => {

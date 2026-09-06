@@ -57,8 +57,12 @@ surface as in-scope attack surface.
 **Post-trim count (SC002):** 8 `<uses-permission>` + a11y bind on service.
 
 **SC005 addition (approved):** `RECEIVE_BOOT_COMPLETED` — BootReceiver restarts the
-companion FGS after reboot when docked mode was left on. Documented in §1.2 table as kept
-for day-one reboot survival. Current count: **9** `<uses-permission>` + a11y bind.
+companion FGS after reboot when docked mode was left on.
+
+**SC006 addition:** `USE_BIOMETRIC` / `USE_FINGERPRINT` — merged from
+`react-native-biometrics` for the app lock gate (fingerprint / device credential).
+
+Current count: **9 declared + 2 from biometrics library merge** + a11y bind.
 
 ### 1.3 Runtime permission policy
 
