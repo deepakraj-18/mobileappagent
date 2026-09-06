@@ -5,3 +5,4 @@ export * from './MockHubClient';
 export * from './HubOutbox';
 export * from './HubAuth';
 export * from './HubConfig';
+export * from './AzureHubClient';
