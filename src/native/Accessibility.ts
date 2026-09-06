@@ -24,10 +24,28 @@ type AccessibilityNative = {
 
 const { AccessibilityBridge } = NativeModules;
 
-if (!AccessibilityBridge) {
+function unavailable(method: string): never {
   throw new Error(
-    'AccessibilityBridge native module is not linked. Rebuild the Android app.',
+    `AccessibilityBridge.${method} unavailable — native module not linked. Rebuild the Android app.`,
   );
 }
 
-export const Accessibility: AccessibilityNative = AccessibilityBridge;
+const stub: AccessibilityNative = {
+  isServiceEnabled: () => unavailable('isServiceEnabled'),
+  openAccessibilitySettings: () => unavailable('openAccessibilitySettings'),
+  openAppInfoSettings: () => unavailable('openAppInfoSettings'),
+  getScreenSize: () => unavailable('getScreenSize'),
+  dumpScreen: () => unavailable('dumpScreen'),
+  takeScreenshot: () => unavailable('takeScreenshot'),
+  clickAt: () => unavailable('clickAt'),
+  swipe: () => unavailable('swipe'),
+  scroll: () => unavailable('scroll'),
+  typeText: () => unavailable('typeText'),
+  pressKey: () => unavailable('pressKey'),
+};
+
+/** Linked native bridge, or a stub that fails only when invoked (Jest-safe import). */
+export const Accessibility: AccessibilityNative =
+  (AccessibilityBridge as AccessibilityNative | undefined) ?? stub;
+
+export const isAccessibilityBridgeLinked = Boolean(AccessibilityBridge);
