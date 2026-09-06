@@ -1,10 +1,24 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CompanionMode } from '../constants/appConstants';
+import { CompanionMode, EventLogLevel } from '../constants/appConstants';
 import { CompanionRuntime } from '../native/CompanionRuntime';
 
 const KEY = 'pa.companion.mode';
 
 type Listener = (mode: CompanionMode) => void;
+
+async function logModeChange(mode: CompanionMode): Promise<void> {
+  try {
+    const { LocalStore } = await import('../store/LocalStore');
+    const store = await LocalStore.open();
+    await store.events.append(
+      EventLogLevel.INFO,
+      'companion',
+      `Mode → ${mode}`,
+    );
+  } catch {
+    // LocalStore / native sqlite may be unavailable in tests
+  }
+}
 
 class CompanionModeServiceImpl {
   private mode: CompanionMode = CompanionMode.OPERATOR;
@@ -39,6 +53,7 @@ class CompanionModeServiceImpl {
     } else {
       void CompanionRuntime.stop();
     }
+    void logModeChange(mode);
     this.emit();
   }
 

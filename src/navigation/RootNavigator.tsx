@@ -7,6 +7,7 @@ import { CompanionMode } from '../constants/appConstants';
 import { CompanionModeService } from '../services/CompanionModeService';
 import { isOnboardingComplete } from './onboarding';
 import type { MainTabParamList, RootStackParamList } from './types';
+import { CompanionHealthScreen } from '../screens/CompanionHealthScreen';
 import { DockScreen } from '../screens/DockScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
@@ -18,9 +19,11 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 function MainTabs({
   companionDocked,
   onToggleCompanion,
+  onOpenHealth,
 }: {
   companionDocked: boolean;
   onToggleCompanion: () => void;
+  onOpenHealth: () => void;
 }): React.JSX.Element {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -30,6 +33,7 @@ function MainTabs({
           <SettingsScreen
             companionDocked={companionDocked}
             onToggleCompanion={onToggleCompanion}
+            onOpenHealth={onOpenHealth}
           />
         )}
       </Tab.Screen>
@@ -41,6 +45,7 @@ export function RootNavigator(): React.JSX.Element {
   const [ready, setReady] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
   const [mode, setMode] = useState<CompanionMode>(CompanionMode.OPERATOR);
+  const [showHealth, setShowHealth] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,12 +94,19 @@ export function RootNavigator(): React.JSX.Element {
           <Stack.Screen name="Dock">
             {() => <DockScreen onExit={exitDock} />}
           </Stack.Screen>
+        ) : showHealth ? (
+          <Stack.Screen name="Health">
+            {() => (
+              <CompanionHealthScreen onBack={() => setShowHealth(false)} />
+            )}
+          </Stack.Screen>
         ) : (
           <Stack.Screen name="MainTabs">
             {() => (
               <MainTabs
                 companionDocked={docked}
                 onToggleCompanion={toggleCompanion}
+                onOpenHealth={() => setShowHealth(true)}
               />
             )}
           </Stack.Screen>

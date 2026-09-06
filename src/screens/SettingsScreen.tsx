@@ -4,11 +4,13 @@ import { StyleSheet, Text, View } from 'react-native';
 type Props = {
   companionDocked: boolean;
   onToggleCompanion: () => void;
+  onOpenHealth: () => void;
 };
 
 export function SettingsScreen({
   companionDocked,
   onToggleCompanion,
+  onOpenHealth,
 }: Props): React.JSX.Element {
   return (
     <View style={styles.root}>
@@ -19,6 +21,12 @@ export function SettingsScreen({
         onPress={onToggleCompanion}
         accessibilityRole="button">
         {companionDocked ? 'Exit docked companion' : 'Enter docked companion'}
+      </Text>
+      <Text
+        style={styles.link}
+        onPress={onOpenHealth}
+        accessibilityRole="button">
+        Companion health
       </Text>
     </View>
   );
