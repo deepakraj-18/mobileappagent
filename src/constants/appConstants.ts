@@ -86,6 +86,8 @@ export const AppLimits = {
   EVENT_LOG_CAP: 1000,
   /** Default hub presence stale window (seconds) — mirrors contract default. */
   PRESENCE_STALE_AFTER_SEC: 300,
+  /** Minimum length for the app-lock backup password (SC006). */
+  APP_LOCK_PASSWORD_MIN_LEN: 4,
 } as const;
 
 /** Default spoken wake phrase (plan.md). BPE line lives in assets/kws/keywords.txt. */

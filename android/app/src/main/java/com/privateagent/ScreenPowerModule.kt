@@ -74,7 +74,7 @@ class ScreenPowerModule(private val ctx: ReactApplicationContext) :
             acquire(60_000L)
           }
       }
-      val activity = currentActivity
+      val activity = ctx.currentActivity
       if (activity != null) {
         activity.runOnUiThread {
           activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -107,7 +107,7 @@ class ScreenPowerModule(private val ctx: ReactApplicationContext) :
   }
 
   private fun clearKeepScreenOn() {
-    val activity = currentActivity ?: return
+    val activity = ctx.currentActivity ?: return
     activity.runOnUiThread {
       activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
