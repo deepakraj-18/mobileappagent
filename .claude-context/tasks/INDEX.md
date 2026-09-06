@@ -36,7 +36,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 |---|---|---|---|---|---|
 | IF001 | GitHub Actions (`tsc --noEmit` + `jest`) **+ Firebase project + `google-services.json`** for FCM | IF | — | 0.75 | Review |
 | IF002 | Device provisioning runbook: enable a11y, notification access, **Vivo auto-start / battery / background-power whitelist**, ADB install script | IF | — | 0.5 | Review |
-| SC001 | `lib/constants/app_constants.dart` — enums / magic numbers (companion mode, presence state, wake state, hub connection state, card kind) per `~/.claude/rules/constants.md` | SC | — | 0.5 | Pending |
+| SC001 | `src/constants/appConstants.ts` — enums / magic numbers (companion mode, presence state, wake state, hub connection state, card kind) | SC | — | 0.5 | In Progress |
 | DB001 | sqflite schema + migrations: `hub_outbox`, `hub_cache`, `event_log` (indexes on status/createdAt). **No user-data tables.** | DB | SC001 | 0.5 | Pending |
 | SC007 | `LocalStore` — open/init/migrate; DAOs for outbox (FIFO + ack + cap), cache (kv + typed cards), event log | SC | SC001, DB001 | 0.75 | Pending |
 | SC002 | Navigation shell — bottom nav `Operator · Settings`; onboarding gate; Dock as a separate full-screen route via the Companion-Mode toggle | SC | SC001 | 0.75 | Pending |
