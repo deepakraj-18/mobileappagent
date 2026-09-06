@@ -3,6 +3,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   Dock: undefined;
   Health: undefined;
+  HubConnection: undefined;
 };
 
 export type MainTabParamList = {

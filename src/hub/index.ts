@@ -8,3 +8,4 @@ export * from './HubConfig';
 export * from './AzureHubClient';
 export * from './fcmReceiver';
 export * from './CompanionRestClient';
+export * from './HubRuntime';

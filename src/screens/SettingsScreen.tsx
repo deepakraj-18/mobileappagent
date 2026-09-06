@@ -14,12 +14,14 @@ type Props = {
   companionDocked: boolean;
   onToggleCompanion: () => void;
   onOpenHealth: () => void;
+  onOpenHub: () => void;
 };
 
 export function SettingsScreen({
   companionDocked,
   onToggleCompanion,
   onOpenHealth,
+  onOpenHub,
 }: Props): React.JSX.Element {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [password, setPassword] = useState('');
@@ -59,6 +61,13 @@ export function SettingsScreen({
         accessibilityRole="button"
       >
         {companionDocked ? 'Exit docked companion' : 'Enter docked companion'}
+      </Text>
+      <Text
+        style={styles.link}
+        onPress={onOpenHub}
+        accessibilityRole="button"
+      >
+        Hub connection
       </Text>
       <Text
         style={styles.link}
