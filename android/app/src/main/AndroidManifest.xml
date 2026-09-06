@@ -6,9 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Companion foreground service (Phase 1 SC004) -->
+    <!-- Companion FGS (SC004) + boot restart (SC005) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- App listing / launching (a11y automation) -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -56,6 +57,18 @@
               android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
               android:value="Desk companion runtime: keeps the docked body awake for hub/voice while charging." />
       </service>
+
+      <!-- Restart FGS after reboot when docked (SC005) -->
+      <receiver
+          android:name=".BootReceiver"
+          android:exported="true"
+          android:enabled="true">
+          <intent-filter>
+              <action android:name="android.intent.action.BOOT_COMPLETED" />
+              <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+              <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+          </intent-filter>
+      </receiver>
 
       <!-- PrivateAgent accessibility service: reads screen hierarchy and
            performs gestures on behalf of the user. -->

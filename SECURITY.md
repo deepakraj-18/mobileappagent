@@ -44,6 +44,7 @@ surface as in-scope attack surface.
 | `QUERY_ALL_PACKAGES` | Launcher / a11y automation over installed apps | Y | **Keep** |
 | `POST_NOTIFICATIONS` | Persistent companion notification | Y | **Keep** — request at point of use when FGS starts, not at cold launch |
 | `VIBRATE` | Notification / alert haptics | Y | **Keep** |
+| `RECEIVE_BOOT_COMPLETED` | Restart companion FGS after reboot if docked | Y | **Added SC005** — BootReceiver; no remote trigger |
 | `BIND_ACCESSIBILITY_SERVICE` | `AgentAccessibilityService` | Y | **Keep** (on service) |
 | `SYSTEM_ALERT_WINDOW` | Floating overlay assistant | N | **Removed** — no RN overlay shipping; also stripped via `tools:node="remove"` so React Native’s **debug**-only merge (`ReactAndroid/src/debug`) cannot reintroduce it |
 | `RECORD_AUDIO` | Wake word / STT | N | **Removed** — Phase 2 voice; re-add with that task |
@@ -53,7 +54,11 @@ surface as in-scope attack surface.
 | `MODIFY_AUDIO_SETTINGS` | Volume / routing | N | **Removed** — no shipping audio-routing feature |
 | `SET_ALARM` | AlarmClock intents | N | **Removed** — no shipping alarm feature |
 
-**Post-trim count:** 8 `<uses-permission>` + a11y bind on service.
+**Post-trim count (SC002):** 8 `<uses-permission>` + a11y bind on service.
+
+**SC005 addition (approved):** `RECEIVE_BOOT_COMPLETED` — BootReceiver restarts the
+companion FGS after reboot when docked mode was left on. Documented in §1.2 table as kept
+for day-one reboot survival. Current count: **9** `<uses-permission>` + a11y bind.
 
 ### 1.3 Runtime permission policy
 
@@ -65,10 +70,10 @@ are requested **at the point of use** with an on-screen rationale, not batched a
 - `AgentAccessibilityService` is `android:exported="true"` with
   `android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"` (system-gated bind).
 - `MainActivity` is `exported="true"` (launcher) — expected.
+- `BootReceiver` is `exported="true"` (required for `BOOT_COMPLETED`); it only starts the
+  FGS when the local docked SharedPreferences flag is set — no external control channel.
 - `android:usesCleartextTraffic` is enabled via manifest placeholder — secrets must never
   ride cleartext.
-- **Do not add** new permissions (e.g. `RECEIVE_BOOT_COMPLETED` for SC005) without an
-  explicit product decision — SC002 stopped at trimming the original 15.
 
 ---
 

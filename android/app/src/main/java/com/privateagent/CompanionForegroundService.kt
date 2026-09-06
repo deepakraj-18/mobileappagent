@@ -107,8 +107,15 @@ class CompanionForegroundService : Service() {
     const val CHANNEL_ID = "companion_runtime"
     const val NOTIFICATION_ID = 42001
     const val ACTION_STOP = "com.privateagent.action.STOP_COMPANION"
+    const val PREFS = "pa_companion"
+    const val PREF_DOCKED = "docked"
 
     fun start(context: Context) {
+      context
+        .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit()
+        .putBoolean(PREF_DOCKED, true)
+        .apply()
       val intent = Intent(context, CompanionForegroundService::class.java)
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         context.startForegroundService(intent)
@@ -118,6 +125,11 @@ class CompanionForegroundService : Service() {
     }
 
     fun stop(context: Context) {
+      context
+        .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        .edit()
+        .putBoolean(PREF_DOCKED, false)
+        .apply()
       val intent =
         Intent(context, CompanionForegroundService::class.java).apply {
           action = ACTION_STOP
