@@ -1,35 +1,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Network -->
+    <!-- Network / connectivity (hub + connectivity checks) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Floating overlay window -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Companion foreground service (Phase 1 SC004) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
-    <!-- App listing / launching -->
+    <!-- App listing / launching (a11y automation) -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
-    <!-- Voice input -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!-- Contacts -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-
-    <!-- Notifications -->
+    <!-- FGS notification + haptics -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!-- System control -->
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.SET_ALARM" />
+    <!-- Removed in SC002 (no day-one shipping feature):
+         SYSTEM_ALERT_WINDOW, RECORD_AUDIO, READ_CONTACTS, WRITE_CONTACTS,
+         WRITE_SETTINGS, MODIFY_AUDIO_SETTINGS, SET_ALARM.
+         Re-add only with a product task that uses them.
+         Strip RN debug-only overlay merge (ReactAndroid/src/debug). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:node="remove" />
 
     <application
       android:name=".MainApplication"

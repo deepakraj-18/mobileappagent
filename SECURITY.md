@@ -2,17 +2,16 @@
 
 **Date:** 2026-09-06  
 **Scope:** Post-IF004 React Native scaffold (`com.privateagent`)  
-**Status:** Decisions recorded for review — not a substitute for SC002 (permission trim)
+**Status:** SC001 decisions stand; SC002 permission trim applied (§1.2)
 
 Telegram is **not** part of this product. Do not treat any historical Telegram bot / chatId
 surface as in-scope attack surface.
 
 ---
 
-## 1. Verified permission inventory (current `AndroidManifest.xml`)
+## 1. Permission inventory & SC002 trim
 
-Re-checked against `android/app/src/main/AndroidManifest.xml` on branch
-`sc/SC001-threat-model` (post-IF004). All of these are present today:
+### 1.1 Pre-trim inventory (SC001 baseline — 15 `<uses-permission>` + a11y bind)
 
 | # | Declaration | Reach / notes |
 |---|---|---|
@@ -21,9 +20,9 @@ Re-checked against `android/app/src/main/AndroidManifest.xml` on branch
 | 3 | `WAKE_LOCK` | Keep CPU awake while agent runs |
 | 4 | `SYSTEM_ALERT_WINDOW` | Draw over other apps |
 | 5 | `FOREGROUND_SERVICE` | Long-running companion process |
-| 6 | `FOREGROUND_SERVICE_SPECIAL_USE` | FGS subtype for companion / overlay-style use |
+| 6 | `FOREGROUND_SERVICE_SPECIAL_USE` | FGS subtype for companion use |
 | 7 | `QUERY_ALL_PACKAGES` | Enumerate installed apps (launcher / automation) |
-| 8 | `RECORD_AUDIO` | Microphone (voice — planned, not yet wired in RN UI) |
+| 8 | `RECORD_AUDIO` | Microphone (voice) |
 | 9 | `READ_CONTACTS` | Read contacts |
 | 10 | `WRITE_CONTACTS` | Write contacts |
 | 11 | `POST_NOTIFICATIONS` | Notifications (API 33+) |
@@ -31,18 +30,45 @@ Re-checked against `android/app/src/main/AndroidManifest.xml` on branch
 | 13 | `WRITE_SETTINGS` | Modify system settings (protected) |
 | 14 | `MODIFY_AUDIO_SETTINGS` | Volume / audio routing |
 | 15 | `SET_ALARM` | Alarm intents |
-| 16 | `BIND_ACCESSIBILITY_SERVICE` (on `AgentAccessibilityService`) | **Read and act on every screen in every app** |
+| 16 | `BIND_ACCESSIBILITY_SERVICE` (on `AgentAccessibilityService`) | Read/act on every screen |
 
-Also noted (not a `<uses-permission>`, but security-relevant):
+### 1.2 SC002 day-one justification table
 
-- `AgentAccessibilityService` is declared `android:exported="true"` with
+| Permission | Feature requiring it | Day-one? | Decision |
+|---|---|---|---|
+| `INTERNET` | Hub / LLM HTTP(S) | Y | **Keep** |
+| `ACCESS_NETWORK_STATE` | Connectivity checks before network calls | Y | **Keep** |
+| `WAKE_LOCK` | Companion FGS keeps CPU awake while docked | Y | **Keep** |
+| `FOREGROUND_SERVICE` | `CompanionForegroundService` (Phase 1 SC004) | Y | **Keep** |
+| `FOREGROUND_SERVICE_SPECIAL_USE` | Companion FGS subtype (`specialUse`) | Y | **Keep** — subtype + justification string land on the FGS service in SC004 (Android 14+) |
+| `QUERY_ALL_PACKAGES` | Launcher / a11y automation over installed apps | Y | **Keep** |
+| `POST_NOTIFICATIONS` | Persistent companion notification | Y | **Keep** — request at point of use when FGS starts, not at cold launch |
+| `VIBRATE` | Notification / alert haptics | Y | **Keep** |
+| `BIND_ACCESSIBILITY_SERVICE` | `AgentAccessibilityService` | Y | **Keep** (on service) |
+| `SYSTEM_ALERT_WINDOW` | Floating overlay assistant | N | **Removed** — no RN overlay shipping; also stripped via `tools:node="remove"` so React Native’s **debug**-only merge (`ReactAndroid/src/debug`) cannot reintroduce it |
+| `RECORD_AUDIO` | Wake word / STT | N | **Removed** — Phase 2 voice; re-add with that task |
+| `READ_CONTACTS` | Contact pick / dial-by-name | N | **Removed** — no shipping feature reads contacts |
+| `WRITE_CONTACTS` | Contact mutation | N | **Removed** — no shipping feature writes contacts |
+| `WRITE_SETTINGS` | System setting changes | N | **Removed** — no shipping feature modifies Settings |
+| `MODIFY_AUDIO_SETTINGS` | Volume / routing | N | **Removed** — no shipping audio-routing feature |
+| `SET_ALARM` | AlarmClock intents | N | **Removed** — no shipping alarm feature |
+
+**Post-trim count:** 8 `<uses-permission>` + a11y bind on service.
+
+### 1.3 Runtime permission policy
+
+Dangerous / runtime grants (`POST_NOTIFICATIONS` today; `RECORD_AUDIO` when Phase 2 re-adds it)
+are requested **at the point of use** with an on-screen rationale, not batched at launch.
+
+### 1.4 Other security-relevant manifest notes
+
+- `AgentAccessibilityService` is `android:exported="true"` with
   `android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"` (system-gated bind).
 - `MainActivity` is `exported="true"` (launcher) — expected.
-- `android:usesCleartextTraffic` is enabled via manifest placeholder — relevant if any HTTP
-  endpoints are used; secrets must never ride cleartext.
-
-SC002 will decide which of the above stay for day-one features. This document does **not**
-remove permissions.
+- `android:usesCleartextTraffic` is enabled via manifest placeholder — secrets must never
+  ride cleartext.
+- **Do not add** new permissions (e.g. `RECEIVE_BOOT_COMPLETED` for SC005) without an
+  explicit product decision — SC002 stopped at trimming the original 15.
 
 ---
 
@@ -59,8 +85,8 @@ remove permissions.
   including over banking / password-manager UIs currently on screen.
 - Read whatever the app has stored locally (settings, future outbox/cache, action logs)
   without defeating encryption at rest if we store plaintext.
-- Change system settings the app is allowed to change (`WRITE_SETTINGS`, audio, etc.) via
-  future features that use those APIs.
+- Change only what remaining permissions allow (network, notifications, a11y, package
+  query) — contacts / write-settings / overlay were dropped in SC002.
 - Grant or revoke the accessibility service in system Settings (user already unlocked).
 
 **What they do *not* get “for free” from PrivateAgent alone**
@@ -84,10 +110,9 @@ remove permissions.
 - Attempt to bind or confuse the accessibility service — binding requires
   `BIND_ACCESSIBILITY_SERVICE`, which normal third-party apps do not hold; the system is the
   binder. A malicious app **cannot** simply call our service as if it were a public API.
-- Abuse **overlay** (`SYSTEM_ALERT_WINDOW`) *if it has that permission itself* to socially
+- Abuse **overlay** *if the malicious app has `SYSTEM_ALERT_WINDOW` itself* to socially
   engineer the user (classic tapjacking / fake UI) while PrivateAgent or Settings is open —
-  this is a platform-wide class of attack, amplified because our agent can act on whatever
-  is visible.
+  platform-wide class of attack; PrivateAgent no longer holds overlay permission (SC002).
 - Read world-readable logs or misuse accessibility *of its own* if the user also enables a
   malicious accessibility service (user-granted; outside our process).
 - If our native module or JS accidentally exposes an exported, unauthenticated IPC surface
@@ -118,8 +143,8 @@ remove permissions.
   approving payments, sending messages, changing settings.
 - Network exfiltration if `INTERNET` is used by compromised JS/native code (future LLM/hub
   clients amplify this).
-- Contact graph read/write if those permissions remain and features call them.
-- Microphone capture if `RECORD_AUDIO` paths are reachable.
+- Contact graph / mic / write-settings are **not** available post-SC002 until re-added
+  with a shipping feature task.
 
 **This is the catastrophic case.** A single RCE, malicious dependency, or logic bug that
 auto-runs agent steps without confirmation is equivalent to a human sitting at the phone
@@ -224,4 +249,4 @@ review risk. Personal / fleet sideload matches the desk-companion use case (Vivo
 | Destructive actions | In-app confirmation required (§5) |
 | Audit log | Required; timestamped; no secrets (§6) |
 | Play Store | **Sideload-only** (§7) |
-| Manifest | Re-verified; 15 `<uses-permission>` + a11y bind on service (§1) |
+| Manifest | SC002 trimmed to 8 `<uses-permission>` + a11y bind (§1.2); contacts / write-settings / overlay / mic / audio / alarm dropped |
