@@ -68,7 +68,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | BD033 | `FcmService.kt` + `fcm_receiver.dart` — high-priority data messages wake the app / force reconnect / carry a compact command when WSS is down                                                                                                     | BD     | BD032, IF001               | 1.5 | Review |
 | BD034 | REST client — typed calls expecting the `~/.claude/rules/api-design.md` envelope + `error-handling.md` error shape; `GET /v1/companion/{cards,config}`, `POST /v1/companion/events` batch replay                                                  | BD     | BD031                      | 1.0 | Review    |
 | FD030 | Hub connection screen — pair/login, live connection status, last-sync, manual retry, sign out / re-pair                                                                                                                                           | FD     | SC002, BD031               | 1.0 | Review    |
-| FI030 | Wire hub client into app startup + FGS + Dock connection chip; `config` command → settings apply                                                                                                                                                  | FI     | FD030, BD032, BD033, BD034 | 1.0 | In Progress |
+| FI030 | Wire hub client into app startup + FGS + Dock connection chip; `config` command → settings apply                                                                                                                                                  | FI     | FD030, BD032, BD033, BD034 | 1.0 | Review    |
 
 ## Phase 4 — Agent execution via hub
 

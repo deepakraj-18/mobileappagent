@@ -5,7 +5,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   CompanionMode,
+  HubConnectionState,
   WakeState,
+  type HubConnectionState as HubConnectionStateType,
   type WakeState as WakeStateType,
 } from '../constants/appConstants';
 import { CompanionModeService } from '../services/CompanionModeService';
@@ -17,6 +19,7 @@ import { HubConnectionScreen } from '../screens/HubConnectionScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { HubRuntime } from '../hub/HubRuntime';
 import {
   startDockVoiceRuntime,
   type DockVoiceRuntime,
@@ -57,14 +60,20 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
   const [wakeState, setWakeState] = useState<WakeStateType>(
     WakeState.LISTENING_FOR_WAKE,
   );
+  const [connectionState, setConnectionState] =
+    useState<HubConnectionStateType>(HubConnectionState.UNPAIRED);
   const runtimeRef = React.useRef<DockVoiceRuntime | null>(null);
 
   useEffect(() => {
     const runtime = startDockVoiceRuntime();
     runtimeRef.current = runtime;
-    const unsub = runtime.subscribe(setWakeState);
+    const unsubWake = runtime.subscribe(setWakeState);
+    const unsubHub = HubRuntime.subscribe(snap => {
+      setConnectionState(snap.connectionState);
+    });
     return () => {
-      unsub();
+      unsubWake();
+      unsubHub();
       runtime.stop();
       runtimeRef.current = null;
     };
@@ -79,6 +88,7 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
       onExit={onExit}
       wakeState={wakeState}
       onTapToTalk={onTapToTalk}
+      connectionState={connectionState}
     />
   );
 }
@@ -95,6 +105,7 @@ export function RootNavigator(): React.JSX.Element {
     (async () => {
       const done = await isOnboardingComplete();
       const m = await CompanionModeService.hydrate();
+      await HubRuntime.start();
       if (!cancelled) {
         setOnboarded(done);
         setMode(m);

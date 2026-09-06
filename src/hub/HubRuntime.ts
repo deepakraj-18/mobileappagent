@@ -4,10 +4,20 @@ import {
   HubConnectionState,
   type HubConnectionState as HubConnectionStateType,
 } from '../constants/appConstants';
+import { CompanionRuntime } from '../native/CompanionRuntime';
+import { CompanionModeService } from '../services/CompanionModeService';
 import { AzureHubClient } from './AzureHubClient';
+import { CompanionSettings } from './CompanionSettings';
+import { companionRestClient } from './CompanionRestClient';
+import { startFcmReceiver } from './fcmReceiver';
 import { hubAuth, type HubSession } from './HubAuth';
 import { HubConfig } from './HubConfig';
-import type { PairDeviceInfo } from './types';
+import type {
+  CompanionConfig,
+  HubCommandPayload,
+  HubFrame,
+  PairDeviceInfo,
+} from './types';
 
 const LAST_SYNC_KEY = 'pa.hub.lastSyncAt';
 
@@ -22,8 +32,8 @@ export type HubRuntimeSnapshot = {
 type Listener = (snap: HubRuntimeSnapshot) => void;
 
 /**
- * Hub connection status + pair/retry/sign-out surface (FD030).
- * FI030 wires startup, FGS, FCM, CONFIG apply, and Dock chip subscriptions.
+ * Hub connection status + pair/retry/sign-out (FD030) and
+ * startup / FGS / FCM / CONFIG wiring (FI030).
  */
 class HubRuntimeImpl {
   private connectionState: HubConnectionStateType = HubConnectionState.UNPAIRED;
@@ -33,7 +43,12 @@ class HubRuntimeImpl {
   private client: AzureHubClient | null = null;
   private readonly listeners = new Set<Listener>();
   private unsubConn: (() => void) | null = null;
+  private unsubCmd: (() => void) | null = null;
+  private unsubFcm: (() => void) | null = null;
   private connecting = false;
+  private started = false;
+  /** FGS started by hub (independent of dock mode). */
+  private hubOwnsFgs = false;
 
   getSnapshot(): HubRuntimeSnapshot {
     return {
@@ -67,6 +82,39 @@ class HubRuntimeImpl {
       this.lastError = err;
     }
     this.emit();
+  }
+
+  /**
+   * App / navigator boot: hydrate tokens, apply cached settings, connect if paired,
+   * hold FGS for WSS, listen for FCM reconnect.
+   */
+  async start(): Promise<void> {
+    if (this.started) {
+      return;
+    }
+    this.started = true;
+    await CompanionSettings.hydrate();
+    await this.hydrate();
+    this.unsubFcm = startFcmReceiver({
+      onForceReconnect: () => this.retry().catch(() => undefined),
+      onCompactCommand: payload => this.handleCompactCommand(payload),
+    });
+    if (hubAuth.isPaired()) {
+      try {
+        await this.connect();
+      } catch {
+        // LifeOSAPI hub may not exist yet — stay DISCONNECTED with lastError
+      }
+      void this.pullConfigQuiet();
+    }
+  }
+
+  async stop(): Promise<void> {
+    this.unsubFcm?.();
+    this.unsubFcm = null;
+    await this.teardownClient();
+    await this.releaseHubFgs();
+    this.started = false;
   }
 
   async hydrate(): Promise<HubRuntimeSnapshot> {
@@ -106,9 +154,9 @@ class HubRuntimeImpl {
       await hubAuth.pair(code, device ?? this.defaultDeviceInfo());
       await this.markSynced();
       await this.connect();
+      void this.pullConfigQuiet();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      // Paired tokens may still exist if only WSS failed — re-read auth
       if (hubAuth.isPaired()) {
         this.setState(HubConnectionState.DISCONNECTED, msg);
       } else {
@@ -140,6 +188,7 @@ class HubRuntimeImpl {
     );
 
     try {
+      await this.ensureHubFgs();
       await this.teardownClient();
       const client = new AzureHubClient({ session });
       this.client = client;
@@ -150,6 +199,9 @@ class HubRuntimeImpl {
         } else if (hubAuth.isPaired()) {
           this.setState(HubConnectionState.RECONNECTING, null);
         }
+      });
+      this.unsubCmd = client.onCommand(frame => {
+        void this.onCommand(frame);
       });
       await client.connect();
       await this.markSynced();
@@ -163,13 +215,13 @@ class HubRuntimeImpl {
     }
   }
 
-  /** Manual retry from the connection screen. */
   async retry(): Promise<void> {
     await this.connect();
   }
 
   async signOut(): Promise<void> {
     await this.teardownClient();
+    await this.releaseHubFgs();
     await hubAuth.clear();
     this.lastError = null;
     this.setState(HubConnectionState.UNPAIRED, null);
@@ -183,6 +235,65 @@ class HubRuntimeImpl {
     return hubAuth.getSession();
   }
 
+  /** Apply CONFIG payload (command or REST). Exported for tests. */
+  async applyConfig(patch: CompanionConfig): Promise<void> {
+    await CompanionSettings.apply(patch);
+    await this.markSynced();
+  }
+
+  private async onCommand(frame: HubFrame<HubCommandPayload>): Promise<void> {
+    const cmd = frame.payload?.command;
+    if (cmd === 'CONFIG') {
+      const { command: _c, ...rest } = frame.payload;
+      await this.applyConfig(rest as CompanionConfig);
+      return;
+    }
+    if (cmd === 'REVOKE') {
+      await this.signOut();
+    }
+  }
+
+  private async handleCompactCommand(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
+    const command = String(payload.command ?? '').toUpperCase();
+    if (command === 'CONFIG') {
+      const { command: _c, ...rest } = payload;
+      await this.applyConfig(rest as CompanionConfig);
+      return;
+    }
+    // Other compact commands: force reconnect so WSS delivers the real frame
+    await this.retry().catch(() => undefined);
+  }
+
+  private async pullConfigQuiet(): Promise<void> {
+    try {
+      const cfg = await companionRestClient.getConfig();
+      await this.applyConfig(cfg);
+    } catch {
+      // Expected until LifeOSAPI GET /v1/companion/config exists
+    }
+  }
+
+  private async ensureHubFgs(): Promise<void> {
+    // WSS rides the companion FGS (BD032 / FI030). Dock mode may already own it.
+    const ok = await CompanionRuntime.start();
+    if (ok) {
+      this.hubOwnsFgs = true;
+    }
+  }
+
+  private async releaseHubFgs(): Promise<void> {
+    if (!this.hubOwnsFgs) {
+      return;
+    }
+    this.hubOwnsFgs = false;
+    // Keep FGS if user is still in docked companion mode
+    if (!CompanionModeService.isDocked()) {
+      await CompanionRuntime.stop();
+    }
+  }
+
   private async markSynced(): Promise<void> {
     this.lastSyncAt = new Date().toISOString();
     await AsyncStorage.setItem(LAST_SYNC_KEY, this.lastSyncAt);
@@ -192,6 +303,8 @@ class HubRuntimeImpl {
   private async teardownClient(): Promise<void> {
     this.unsubConn?.();
     this.unsubConn = null;
+    this.unsubCmd?.();
+    this.unsubCmd = null;
     if (this.client) {
       try {
         await this.client.disconnect();

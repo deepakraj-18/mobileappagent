@@ -15,8 +15,9 @@ export type DockScreenProps = {
   /** Voice / wake UI state — FI005 drives this from VoiceSession. */
   wakeState?: WakeStateType;
   onTapToTalk?: () => void;
-  /** Placeholders until Phase 3 / 5 wire real hub + presence. */
+  /** Hub connection — FI030 drives this from HubRuntime. */
   connectionState?: HubConnectionStateType;
+  /** Placeholders until Phase 5 wires presence. */
   presenceState?: PresenceStateType;
   now?: Date;
 };
