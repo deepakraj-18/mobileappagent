@@ -38,7 +38,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | IF002 | Device provisioning runbook: enable a11y, notification access, **Vivo auto-start / battery / background-power whitelist**, ADB install script | IF | — | 0.5 | Review |
 | SC001 | `src/constants/appConstants.ts` — enums / magic numbers (companion mode, presence state, wake state, hub connection state, card kind) | SC | — | 0.5 | Review |
 | DB001 | `@op-engineering/op-sqlite` schema + migrations: `hub_outbox`, `hub_cache`, `event_log` (indexes on status/createdAt). **No user-data tables.** | DB | SC001 | 0.5 | Review |
-| SC007 | `LocalStore` — open/init/migrate; DAOs for outbox (FIFO + ack + cap), cache (kv + typed cards), event log | SC | SC001, DB001 | 0.75 | Pending |
+| SC007 | `LocalStore` — open/init/migrate; DAOs for outbox (FIFO + ack + cap), cache (kv + typed cards), event log | SC | SC001, DB001 | 0.75 | In Progress |
 | SC002 | Navigation shell — bottom nav `Operator · Settings`; onboarding gate; Dock as a separate full-screen route via the Companion-Mode toggle | SC | SC001 | 0.75 | Pending |
 | SC003 | `CompanionModeService` — persisted docked-companion flag + lifecycle events; toggle entry point | SC | SC001 | 0.5 | Pending |
 | SC004 | `CompanionForegroundService.kt` + Dart hook — persistent notification, `START_STICKY`, wakelock, keep-screen-on hooks; manifest perms | SC | SC003 | 1.5 | Pending |
