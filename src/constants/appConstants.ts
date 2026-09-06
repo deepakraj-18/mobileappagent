@@ -87,3 +87,26 @@ export const AppLimits = {
   /** Default hub presence stale window (seconds) — mirrors contract default. */
   PRESENCE_STALE_AFTER_SEC: 300,
 } as const;
+
+/** Default spoken wake phrase (plan.md). BPE line lives in assets/kws/keywords.txt. */
+export const WakeWord = {
+  DEFAULT_PHRASE: 'Hey Genie',
+  SAMPLE_RATE: 16000,
+} as const;
+
+/** Bundled sherpa-onnx KWS model file names under assets/kws/. */
+export const KwsModelFiles = {
+  ENCODER: 'encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx',
+  DECODER: 'decoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx',
+  JOINER: 'joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx',
+  TOKENS: 'tokens.txt',
+  KEYWORDS: 'keywords.txt',
+  MODEL_TYPE: 'zipformer2',
+} as const;
+
+export const WakeEventSource = {
+  KEYWORD: 'KEYWORD',
+  TAP: 'TAP',
+} as const;
+export type WakeEventSource =
+  (typeof WakeEventSource)[keyof typeof WakeEventSource];

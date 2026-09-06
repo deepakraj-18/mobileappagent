@@ -19,8 +19,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Phase 2 BD003 — wake-word / tap-to-talk mic (deferred from SC002) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <!-- Removed in SC002 (no day-one shipping feature):
-         SYSTEM_ALERT_WINDOW, RECORD_AUDIO, READ_CONTACTS, WRITE_CONTACTS,
+         SYSTEM_ALERT_WINDOW, READ_CONTACTS, WRITE_CONTACTS,
          WRITE_SETTINGS, MODIFY_AUDIO_SETTINGS, SET_ALARM.
          Re-add only with a product task that uses them.
          Strip RN debug-only overlay merge (ReactAndroid/src/debug). -->

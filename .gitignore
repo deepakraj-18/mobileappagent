@@ -72,3 +72,6 @@ android/app/.cxx/
 android/.gradle/
 /android/build/
 
+# Local KWS download scratch (committed assets live under android/.../assets/kws)
+/tools/kws-tmp/
+

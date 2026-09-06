@@ -11,6 +11,7 @@ class AccessibilityPackage : ReactPackage {
             AccessibilityModule(reactContext),
             CompanionModule(reactContext),
             TtsModule(reactContext),
+            KwsAssetsModule(reactContext),
         )
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> =
