@@ -76,7 +76,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------------ | ---- | ------- |
 | BD040 | Refactor `TaskExecutor` "think" step → request `agent_action` from the hub; stream `screen_dump` / `step_result` (+ screenshot) back; keep `TaskStep.tryParse` contract              | BD     | BD032        | 2.0  | Review      |
 | BD042 | Inbound `run_goal` → executor; `goal_finished` + acks back; reject/queue when busy                                                                                                   | BD     | BD040        | 1.0  | Review      |
-| BD041 | Local fallback LLM provider — single OpenAI-compatible endpoint+key (secure storage); `ai_service.dart` demoted to this; auto-engage when hub unreachable                            | BD     | BD040        | 1.0  | Pending |
+| BD041 | Local fallback LLM provider — single OpenAI-compatible endpoint+key (secure storage); `ai_service.dart` demoted to this; auto-engage when hub unreachable                            | BD     | BD040        | 1.0  | In Progress |
 | FD041 | Settings: fallback-provider form (base URL, key, model, test) + companion settings (wake phrase, "stay awake while charging", presence anchor picker, Vivo whitelist helper buttons) | FD     | SC002, BD041 | 1.25 | Pending |
 | FI040 | Wire fallback provider + companion settings ↔ services; degraded-mode banner on Dock                                                                                                 | FI     | FD041, BD041 | 0.5  | Pending |
 
