@@ -97,7 +97,7 @@ The v2 Gmail/Google/multi-provider tasks are **dropped** (moved to the user's Az
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------- | --- | ------- |
 | FD060 | Onboarding — companion setup: a11y, notification access, **Vivo battery/auto-start whitelist walkthrough**, pair with the brain, set wake phrase, pick presence anchor, grant mic/BLE | FD     | FD030, FD041     | 1.5 | Review |
 | QA060 | Funtouch background-survival testing — screen off, overnight, force-stop, reboot, WSS drop → FCM recovery; document breakages + whitelist fixes                                       | QA     | (Phase 1–3 done) | 1.0 | Review |
-| QA061 | Offline / degraded-mode testing — brain unreachable, internet down, token expired: local fallback LLM, BLE presence, outbox replay, stale cards, clear status messaging               | QA     | (Phase 3–5 done) | 1.0 | In Progress |
+| QA061 | Offline / degraded-mode testing — brain unreachable, internet down, token expired: local fallback LLM, BLE presence, outbox replay, stale cards, clear status messaging               | QA     | (Phase 3–5 done) | 1.0 | Review |
 
 ## Phase 7 — DEFERRED
 
