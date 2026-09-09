@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { CompanionSettings } from '../hub/CompanionSettings';
 import { Accessibility } from '../native/Accessibility';
+import { NotificationForwarder } from '../proactivity/notificationForwarder';
 
 type Props = { onBack: () => void };
 
@@ -25,6 +26,7 @@ export function CompanionPrefsScreen({ onBack }: Props): React.JSX.Element {
   const [wakePhrase, setWakePhrase] = useState('Hey Genie');
   const [stayAwakeWhileCharging, setStayAwakeWhileCharging] = useState(false);
   const [presenceAnchor, setPresenceAnchor] = useState('amazfit');
+  const [forwardNotifications, setForwardNotifications] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -39,7 +41,11 @@ export function CompanionPrefsScreen({ onBack }: Props): React.JSX.Element {
       if (anchor) {
         setPresenceAnchor(anchor);
       }
+      if (cfg.notificationForwarding?.enabled === true) {
+        setForwardNotifications(true);
+      }
     });
+    void NotificationForwarder.isOptedIn().then(setForwardNotifications);
   }, []);
 
   const save = useCallback(async () => {
@@ -53,11 +59,12 @@ export function CompanionPrefsScreen({ onBack }: Props): React.JSX.Element {
         },
         presenceAnchorId: presenceAnchor,
       });
+      await NotificationForwarder.setOptedIn(forwardNotifications);
       Alert.alert('Saved', 'Companion settings updated.');
     } finally {
       setBusy(false);
     }
-  }, [wakePhrase, stayAwakeWhileCharging, presenceAnchor]);
+  }, [wakePhrase, stayAwakeWhileCharging, presenceAnchor, forwardNotifications]);
 
   const openAppInfo = useCallback(() => {
     void Accessibility.openAppInfoSettings().catch((e: unknown) => {
@@ -124,6 +131,32 @@ export function CompanionPrefsScreen({ onBack }: Props): React.JSX.Element {
           </Text>
         </Pressable>
       ))}
+
+      <View style={styles.row}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Forward notifications to hub</Text>
+          <Text style={styles.hint}>Off by default. Requires notification access.</Text>
+        </View>
+        <Switch
+          value={forwardNotifications}
+          onValueChange={setForwardNotifications}
+          testID="prefs-notify-forward"
+        />
+      </View>
+      <Pressable
+        style={[styles.btn, styles.secondary]}
+        onPress={() => {
+          void NotificationForwarder.openAccessSettings().catch((e: unknown) => {
+            Alert.alert(
+              'Could not open settings',
+              e instanceof Error ? e.message : String(e),
+            );
+          });
+        }}
+        testID="prefs-notify-access"
+      >
+        <Text style={styles.btnText}>Open notification access settings</Text>
+      </Pressable>
 
       <Text style={styles.section}>Vivo / OEM whitelist helpers</Text>
       <Text style={styles.hint}>

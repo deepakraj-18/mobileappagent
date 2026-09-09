@@ -6,8 +6,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   CompanionMode,
   HubConnectionState,
+  PresenceState,
   WakeState,
   type HubConnectionState as HubConnectionStateType,
+  type PresenceState as PresenceStateType,
   type WakeState as WakeStateType,
 } from '../constants/appConstants';
 import { CompanionModeService } from '../services/CompanionModeService';
@@ -22,7 +24,9 @@ import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { HubRuntime } from '../hub/HubRuntime';
+import type { HubCard } from '../hub/types';
 import { DegradedMode } from '../agent/DegradedMode';
+import { ProactivityRuntime } from '../proactivity/ProactivityRuntime';
 import {
   startDockVoiceRuntime,
   type DockVoiceRuntime,
@@ -72,6 +76,15 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
   const [connectionState, setConnectionState] =
     useState<HubConnectionStateType>(HubConnectionState.UNPAIRED);
   const [degradedActive, setDegradedActive] = useState(false);
+  const [presenceState, setPresenceState] = useState<PresenceStateType>(
+    PresenceState.UNKNOWN,
+  );
+  const [cards, setCards] = useState<HubCard[]>([]);
+  const [cardsOffline, setCardsOffline] = useState(false);
+  const [cardsStaleSince, setCardsStaleSince] = useState<string | null>(null);
+  const [announcementStatus, setAnnouncementStatus] = useState<string | null>(
+    null,
+  );
   const runtimeRef = React.useRef<DockVoiceRuntime | null>(null);
 
   useEffect(() => {
@@ -84,10 +97,48 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
     const unsubDeg = DegradedMode.subscribe(snap => {
       setDegradedActive(snap.active);
     });
+
+    const unsubs: Array<() => void> = [];
+    const clearProactivity = () => {
+      for (const u of unsubs.splice(0)) {
+        u();
+      }
+    };
+    const bindProactivity = () => {
+      clearProactivity();
+      const presence = ProactivityRuntime.getPresence();
+      if (presence) {
+        unsubs.push(presence.subscribe(setPresenceState));
+      } else {
+        setPresenceState(PresenceState.UNKNOWN);
+      }
+      const dockCards = ProactivityRuntime.getCards();
+      if (dockCards) {
+        unsubs.push(
+          dockCards.subscribe(snap => {
+            setCards(snap.cards);
+            setCardsOffline(snap.offline);
+            setCardsStaleSince(snap.staleSince);
+          }),
+        );
+      } else {
+        setCards([]);
+        setCardsOffline(false);
+        setCardsStaleSince(null);
+      }
+    };
+    const unsubReady = ProactivityRuntime.onReady(bindProactivity);
+    const unsubAnnounce = ProactivityRuntime.onAnnouncementStatus(
+      setAnnouncementStatus,
+    );
+
     return () => {
       unsubWake();
       unsubHub();
       unsubDeg();
+      unsubReady();
+      unsubAnnounce();
+      clearProactivity();
       runtime.stop();
       runtimeRef.current = null;
     };
@@ -103,7 +154,12 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
       wakeState={wakeState}
       onTapToTalk={onTapToTalk}
       connectionState={connectionState}
+      presenceState={presenceState}
       degradedActive={degradedActive}
+      cards={cards}
+      cardsOffline={cardsOffline}
+      cardsStaleSince={cardsStaleSince}
+      announcementStatus={announcementStatus}
     />
   );
 }
