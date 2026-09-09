@@ -9,6 +9,8 @@ import {
   type PresenceState as PresenceStateType,
   type WakeState as WakeStateType,
 } from '../constants/appConstants';
+import type { HubCard } from '../hub/types';
+import { DockCardList } from './dock/DockCardList';
 
 export type DockScreenProps = {
   onExit: () => void;
@@ -17,10 +19,16 @@ export type DockScreenProps = {
   onTapToTalk?: () => void;
   /** Hub connection — FI030 drives this from HubRuntime. */
   connectionState?: HubConnectionStateType;
-  /** Placeholders until Phase 5 wires presence. */
+  /** Presence — FI050 / BD005. */
   presenceState?: PresenceStateType;
   /** FI040 — hub unreachable + local fallback active. */
   degradedActive?: boolean;
+  /** FD050 / BD051 dock cards. */
+  cards?: HubCard[];
+  cardsOffline?: boolean;
+  cardsStaleSince?: string | null;
+  /** Optional announcement status line. */
+  announcementStatus?: string | null;
   now?: Date;
 };
 
@@ -107,6 +115,10 @@ export function DockScreen({
   connectionState = HubConnectionState.UNPAIRED,
   presenceState = PresenceState.UNKNOWN,
   degradedActive = false,
+  cards = [],
+  cardsOffline = false,
+  cardsStaleSince = null,
+  announcementStatus = null,
   now: nowProp,
 }: DockScreenProps): React.JSX.Element {
   const [now, setNow] = useState(() => nowProp ?? new Date());
@@ -157,7 +169,18 @@ export function DockScreen({
           <Text style={styles.status} testID="dock-status">
             {dockStatusLabel(wakeState)}
           </Text>
+          {announcementStatus ? (
+            <Text style={styles.announce} testID="dock-announcement-status">
+              {announcementStatus}
+            </Text>
+          ) : null}
         </View>
+
+        <DockCardList
+          cards={cards}
+          offline={cardsOffline}
+          staleSince={cardsStaleSince}
+        />
 
         <Pressable
           style={styles.tap}
@@ -279,6 +302,12 @@ const styles = StyleSheet.create({
     color: '#e2e8f0',
     fontSize: 16,
     fontWeight: '600',
+  },
+  announce: {
+    color: '#fde68a',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   tap: {
     width: '100%',
