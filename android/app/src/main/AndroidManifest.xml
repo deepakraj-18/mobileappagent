@@ -22,6 +22,15 @@
     <!-- Phase 2 BD003 — wake-word / tap-to-talk mic (deferred from SC002) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Phase 6 FD060 / BD005 — BLE presence scan on API 28 needs location;
+         API 31+ uses BLUETOOTH_SCAN (declared for forward-compat). -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" tools:targetApi="s" />
+
     <!-- Removed in SC002 (no day-one shipping feature):
          SYSTEM_ALERT_WINDOW, READ_CONTACTS, WRITE_CONTACTS,
          WRITE_SETTINGS, MODIFY_AUDIO_SETTINGS, SET_ALARM.
