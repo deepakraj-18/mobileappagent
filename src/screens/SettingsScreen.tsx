@@ -15,6 +15,8 @@ type Props = {
   onToggleCompanion: () => void;
   onOpenHealth: () => void;
   onOpenHub: () => void;
+  onOpenFallback: () => void;
+  onOpenPrefs: () => void;
 };
 
 export function SettingsScreen({
@@ -22,6 +24,8 @@ export function SettingsScreen({
   onToggleCompanion,
   onOpenHealth,
   onOpenHub,
+  onOpenFallback,
+  onOpenPrefs,
 }: Props): React.JSX.Element {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [password, setPassword] = useState('');
@@ -68,6 +72,20 @@ export function SettingsScreen({
         accessibilityRole="button"
       >
         Hub connection
+      </Text>
+      <Text
+        style={styles.link}
+        onPress={onOpenFallback}
+        accessibilityRole="button"
+      >
+        Fallback LLM provider
+      </Text>
+      <Text
+        style={styles.link}
+        onPress={onOpenPrefs}
+        accessibilityRole="button"
+      >
+        Companion settings
       </Text>
       <Text
         style={styles.link}

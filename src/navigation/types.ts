@@ -4,6 +4,8 @@ export type RootStackParamList = {
   Dock: undefined;
   Health: undefined;
   HubConnection: undefined;
+  FallbackProvider: undefined;
+  CompanionPrefs: undefined;
 };
 
 export type MainTabParamList = {

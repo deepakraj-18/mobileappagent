@@ -14,7 +14,9 @@ import { CompanionModeService } from '../services/CompanionModeService';
 import { isOnboardingComplete } from './onboarding';
 import type { MainTabParamList, RootStackParamList } from './types';
 import { CompanionHealthScreen } from '../screens/CompanionHealthScreen';
+import { CompanionPrefsScreen } from '../screens/CompanionPrefsScreen';
 import { DockScreen } from '../screens/DockScreen';
+import { FallbackProviderScreen } from '../screens/FallbackProviderScreen';
 import { HubConnectionScreen } from '../screens/HubConnectionScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
@@ -33,11 +35,15 @@ function MainTabs({
   onToggleCompanion,
   onOpenHealth,
   onOpenHub,
+  onOpenFallback,
+  onOpenPrefs,
 }: {
   companionDocked: boolean;
   onToggleCompanion: () => void;
   onOpenHealth: () => void;
   onOpenHub: () => void;
+  onOpenFallback: () => void;
+  onOpenPrefs: () => void;
 }): React.JSX.Element {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -49,6 +55,8 @@ function MainTabs({
             onToggleCompanion={onToggleCompanion}
             onOpenHealth={onOpenHealth}
             onOpenHub={onOpenHub}
+            onOpenFallback={onOpenFallback}
+            onOpenPrefs={onOpenPrefs}
           />
         )}
       </Tab.Screen>
@@ -99,6 +107,8 @@ export function RootNavigator(): React.JSX.Element {
   const [mode, setMode] = useState<CompanionMode>(CompanionMode.OPERATOR);
   const [showHealth, setShowHealth] = useState(false);
   const [showHub, setShowHub] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
+  const [showPrefs, setShowPrefs] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,6 +168,16 @@ export function RootNavigator(): React.JSX.Element {
           <Stack.Screen name="HubConnection">
             {() => <HubConnectionScreen onBack={() => setShowHub(false)} />}
           </Stack.Screen>
+        ) : showFallback ? (
+          <Stack.Screen name="FallbackProvider">
+            {() => (
+              <FallbackProviderScreen onBack={() => setShowFallback(false)} />
+            )}
+          </Stack.Screen>
+        ) : showPrefs ? (
+          <Stack.Screen name="CompanionPrefs">
+            {() => <CompanionPrefsScreen onBack={() => setShowPrefs(false)} />}
+          </Stack.Screen>
         ) : (
           <Stack.Screen name="MainTabs">
             {() => (
@@ -166,6 +186,8 @@ export function RootNavigator(): React.JSX.Element {
                 onToggleCompanion={toggleCompanion}
                 onOpenHealth={() => setShowHealth(true)}
                 onOpenHub={() => setShowHub(true)}
+                onOpenFallback={() => setShowFallback(true)}
+                onOpenPrefs={() => setShowPrefs(true)}
               />
             )}
           </Stack.Screen>
