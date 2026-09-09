@@ -2,6 +2,8 @@ import type { HubClient } from '../hub/HubClient';
 import type { HubCommandPayload, HubFrame } from '../hub/types';
 import { makeFrame } from '../hub/types';
 import { Accessibility } from '../native/Accessibility';
+import type { LocalFallbackLlm } from './LocalFallbackLlm';
+import { LocalFallbackStore } from './LocalFallbackStore';
 import { TaskStep } from './TaskStep';
 
 export type GoalStatus = 'SUCCESS' | 'FAILED' | 'CANCELLED';
@@ -28,6 +30,8 @@ export type TaskExecutorDeps = {
   defaultMaxSteps?: number;
   /** Injected clock for tests. */
   sleep?: (ms: number) => Promise<void>;
+  /** Local OpenAI-compatible fallback when hub think times out (BD041). */
+  localLlm?: LocalFallbackLlm | null;
 };
 
 type PendingAction = {
@@ -47,12 +51,14 @@ export class TaskExecutor {
   private readonly stepDelayMs: number;
   private readonly defaultMaxSteps: number;
   private readonly sleep: (ms: number) => Promise<void>;
+  private readonly localLlm: LocalFallbackLlm | null;
 
   private busy = false;
   private cancelRequested = false;
   private activeGoalId: string | null = null;
   private pending: PendingAction | null = null;
   private unsubCmd: (() => void) | null = null;
+  private usedLocalFallback = false;
 
   constructor(deps: TaskExecutorDeps) {
     this.hub = deps.hub;
@@ -62,6 +68,7 @@ export class TaskExecutor {
     this.defaultMaxSteps = deps.defaultMaxSteps ?? 15;
     this.sleep =
       deps.sleep ?? ((ms: number) => new Promise(r => setTimeout(r, ms)));
+    this.localLlm = deps.localLlm === undefined ? null : deps.localLlm;
   }
 
   isBusy(): boolean {
@@ -105,6 +112,7 @@ export class TaskExecutor {
     this.busy = true;
     this.cancelRequested = false;
     this.activeGoalId = input.goalId;
+    this.usedLocalFallback = false;
     const maxSteps = input.constraints?.maxSteps ?? this.defaultMaxSteps;
     let status: GoalStatus = 'FAILED';
     let stepsCompleted = 0;
@@ -128,25 +136,32 @@ export class TaskExecutor {
         });
 
         const actionFrame = await actionWait;
-        if (!actionFrame) {
-          status = this.cancelRequested ? 'CANCELLED' : 'FAILED';
-          break;
+        let decision: TaskStep | null = null;
+
+        if (actionFrame) {
+          decision = TaskStep.fromHubAction(
+            actionFrame.payload.action,
+            String(actionFrame.payload.reasoning ?? ''),
+          );
+        } else if (!this.cancelRequested) {
+          decision = await this.thinkLocally(input.goal, compact);
         }
 
-        const decision = TaskStep.fromHubAction(
-          actionFrame.payload.action,
-          String(actionFrame.payload.reasoning ?? ''),
-        );
         if (!decision) {
-          await this.emitStepResult({
-            goalId: input.goalId,
-            step,
-            action: 'unknown',
-            ok: false,
-            changed: false,
-            note: 'AGENT_ACTION failed TaskStep.tryParse / fromHubAction',
-          });
-          continue;
+          status = this.cancelRequested ? 'CANCELLED' : 'FAILED';
+          if (!this.cancelRequested) {
+            await this.emitStepResult({
+              goalId: input.goalId,
+              step,
+              action: 'unknown',
+              ok: false,
+              changed: false,
+              note: actionFrame
+                ? 'AGENT_ACTION failed TaskStep parse'
+                : 'hub think timeout and local fallback unavailable',
+            });
+          }
+          break;
         }
 
         if (
@@ -201,6 +216,7 @@ export class TaskExecutor {
         status,
         steps: stepsCompleted,
         summary: status === 'SUCCESS' ? 'completed' : status.toLowerCase(),
+        usedLocalFallback: this.usedLocalFallback,
       });
       this.busy = false;
       this.activeGoalId = null;
@@ -208,6 +224,29 @@ export class TaskExecutor {
     }
 
     return status;
+  }
+
+  private async thinkLocally(
+    goal: string,
+    screenDescription: string,
+  ): Promise<TaskStep | null> {
+    if (!this.localLlm) {
+      return null;
+    }
+    const meta = await LocalFallbackStore.getMeta();
+    if (!meta.enabled || !meta.baseUrl) {
+      return null;
+    }
+    try {
+      const step = await this.localLlm.completeAction({
+        goal,
+        screenDescription,
+      });
+      this.usedLocalFallback = true;
+      return step;
+    } catch {
+      return null;
+    }
   }
 
   private async onHubCommand(
