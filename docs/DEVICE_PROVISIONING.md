@@ -83,12 +83,13 @@ adb -s NR4DLF4HEIIVPNW4 shell am start -a android.settings.APPLICATION_DETAILS_S
 
 ---
 
-## 4. Notification listener (later phases)
+## 4. Notification listener (Phase 5 / BD052)
 
-Phase 5 `BD052` will need **Notification access** (opt-in, off by default). Do **not**
-enable until that feature ships. Path when needed:
+Opt-in notification forwarding needs **Notification access** (off by default). Path:
 
 **Settings → Apps → Special app access → Notification access → PrivateAgent**.
+
+Also available from FD060 onboarding and Companion settings.
 
 ---
 
@@ -99,8 +100,9 @@ enable until that feature ships. Path when needed:
 | Package installed | `adb shell pm path com.privateagent`                                                            |
 | App launches      | `adb shell am start -n com.privateagent/.MainActivity`                                          |
 | A11y on           | In-app bridge status `a11y=ON`                                                                  |
-| Autostart         | After reboot, with companion mode on (SC005), FGS should return — once Phase 1 SC004/SC005 land |
+| Autostart         | After reboot with companion docked (`pa_companion` pref), `BootReceiver` should restart FGS (QA060 §4) |
 | Overnight         | Leave docked + charging; confirm companion notification still present next morning (QA060)      |
+| Survival probes   | `.\scripts\qa060-survival-probes.ps1` — see [`QA060_FUNTOUCH_SURVIVAL.md`](./QA060_FUNTOUCH_SURVIVAL.md) |
 
 ---
 
