@@ -14,6 +14,7 @@ class AccessibilityPackage : ReactPackage {
             KwsAssetsModule(reactContext),
             ScreenPowerModule(reactContext),
             FcmModule(reactContext),
+            NotificationForwarderModule(reactContext),
         )
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> =
