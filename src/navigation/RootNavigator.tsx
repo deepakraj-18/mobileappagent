@@ -22,6 +22,7 @@ import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { OperatorScreen } from '../screens/OperatorScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { HubRuntime } from '../hub/HubRuntime';
+import { DegradedMode } from '../agent/DegradedMode';
 import {
   startDockVoiceRuntime,
   type DockVoiceRuntime,
@@ -70,6 +71,7 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
   );
   const [connectionState, setConnectionState] =
     useState<HubConnectionStateType>(HubConnectionState.UNPAIRED);
+  const [degradedActive, setDegradedActive] = useState(false);
   const runtimeRef = React.useRef<DockVoiceRuntime | null>(null);
 
   useEffect(() => {
@@ -79,9 +81,13 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
     const unsubHub = HubRuntime.subscribe(snap => {
       setConnectionState(snap.connectionState);
     });
+    const unsubDeg = DegradedMode.subscribe(snap => {
+      setDegradedActive(snap.active);
+    });
     return () => {
       unsubWake();
       unsubHub();
+      unsubDeg();
       runtime.stop();
       runtimeRef.current = null;
     };
@@ -97,6 +103,7 @@ function DockRoute({ onExit }: { onExit: () => void }): React.JSX.Element {
       wakeState={wakeState}
       onTapToTalk={onTapToTalk}
       connectionState={connectionState}
+      degradedActive={degradedActive}
     />
   );
 }

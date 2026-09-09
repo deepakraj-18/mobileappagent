@@ -4,3 +4,4 @@ export * from './GoalCommandRouter';
 export * from './LocalFallbackStore';
 export * from './LocalFallbackLlm';
 export * from './DegradedMode';
+export * from './AgentRuntime';

@@ -6,6 +6,8 @@ import {
 } from '../constants/appConstants';
 import { CompanionRuntime } from '../native/CompanionRuntime';
 import { CompanionModeService } from '../services/CompanionModeService';
+import { AgentRuntime } from '../agent/AgentRuntime';
+import { DegradedMode } from '../agent/DegradedMode';
 import { AzureHubClient } from './AzureHubClient';
 import { CompanionSettings } from './CompanionSettings';
 import { companionRestClient } from './CompanionRestClient';
@@ -81,6 +83,7 @@ class HubRuntimeImpl {
     if (err !== undefined) {
       this.lastError = err;
     }
+    DegradedMode.setHubConnectionState(connectionState);
     this.emit();
   }
 
@@ -192,6 +195,7 @@ class HubRuntimeImpl {
       await this.teardownClient();
       const client = new AzureHubClient({ session });
       this.client = client;
+      AgentRuntime.attach(client);
       this.unsubConn = client.onConnectionChange(connected => {
         if (connected) {
           void this.markSynced();
@@ -301,6 +305,7 @@ class HubRuntimeImpl {
   }
 
   private async teardownClient(): Promise<void> {
+    AgentRuntime.detach();
     this.unsubConn?.();
     this.unsubConn = null;
     this.unsubCmd?.();

@@ -19,6 +19,8 @@ export type DockScreenProps = {
   connectionState?: HubConnectionStateType;
   /** Placeholders until Phase 5 wires presence. */
   presenceState?: PresenceStateType;
+  /** FI040 — hub unreachable + local fallback active. */
+  degradedActive?: boolean;
   now?: Date;
 };
 
@@ -104,6 +106,7 @@ export function DockScreen({
   onTapToTalk,
   connectionState = HubConnectionState.UNPAIRED,
   presenceState = PresenceState.UNKNOWN,
+  degradedActive = false,
   now: nowProp,
 }: DockScreenProps): React.JSX.Element {
   const [now, setNow] = useState(() => nowProp ?? new Date());
@@ -120,6 +123,13 @@ export function DockScreen({
   return (
     <View style={styles.root} testID="dock-screen">
       <View style={styles.canvas}>
+        {degradedActive ? (
+          <View style={styles.degradedBanner} testID="dock-degraded-banner">
+            <Text style={styles.degradedText}>
+              Hub offline — local fallback active
+            </Text>
+          </View>
+        ) : null}
         <View style={styles.chips}>
           <View style={styles.chip} testID="dock-connection-chip">
             <Text style={styles.chipText}>
@@ -207,6 +217,19 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 11,
     fontWeight: '600',
+  },
+  degradedBanner: {
+    backgroundColor: '#78350f',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 4,
+  },
+  degradedText: {
+    color: '#fde68a',
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   clockBlock: {
     alignItems: 'center',
